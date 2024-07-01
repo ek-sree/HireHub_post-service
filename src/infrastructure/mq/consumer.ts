@@ -5,7 +5,7 @@ import rabbitMQConfig from "../config/rabbitMq";
 export default class Consumer {
     constructor(private channel: Channel) {}
 
-    async consumeMessage() {
+    async consumeMessages() {
         console.log("Ready to consume message");
         await this.channel.assertQueue(rabbitMQConfig.rabbitMQ.queues.postQueue, { durable: true });
         this.channel.consume(rabbitMQConfig.rabbitMQ.queues.postQueue, async (message: ConsumeMessage | null) => {

@@ -5,12 +5,71 @@ import { Jobpost } from "../../model/Jobpost";
 export class JobpostRepository implements IJobpostRepository {
     async save(jobpost: IJobpost): Promise<IJobpost> {
         try {
+            console.log("repository", jobpost);
+            
             const newJobpost = new Jobpost(jobpost);
             const savedJobpost = await newJobpost.save();
+            console.log("saved add new job", savedJobpost);
+            
             return savedJobpost;
         } catch (error) {
             const err = error as Error;
+            console.log("error saving data", err);
             throw new Error(`Error saving job post: ${err.message}`);
+        }
+    }
+
+    async findRecruiterJobs(recruiterId: string | { recruiterId: string }): Promise<IJobpost[]> {
+        let actualRecruiterId: string;
+        
+        if (typeof recruiterId === 'string') {
+            actualRecruiterId = recruiterId;
+        } else if (typeof recruiterId === 'object') {
+            actualRecruiterId = recruiterId.recruiterId;
+        } else {
+            throw new Error("Invalid recruiterId type");
+        }
+
+        console.log(actualRecruiterId, "sdsdfsdffds");
+
+        try {
+            const allJobs = await Jobpost.find({ recruiterId: actualRecruiterId });
+            console.log("found recruiter add job data from db", allJobs);
+            
+            return allJobs;
+        } catch (error) {
+            const err = error as Error;
+            console.log("error fetching all jobs", err);
+            throw new Error(`Error fetching all jobs: ${err.message}`);
+        }
+    }
+
+    async findAllJobs(): Promise<IJobpost[]> {
+        try {
+            const data = await Jobpost.find();
+            return data
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error fetching all jobs",err);
+            throw new Error(`Error fetching all jobs`);
+        }
+    } 
+
+    async editJob(jobData: IJobpost): Promise<IJobpost | null> {
+        try {
+            const { jobId } = jobData;
+            console.log("id job", jobId);
+            if(!jobId) {
+                throw new Error("Hob id is not found");
+            }
+
+            const updatedJobpost = await Jobpost.findByIdAndUpdate({_id:jobId}, jobData, {new:true});
+            return updatedJobpost;
+            
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error editing jobs",err);
+            throw new Error(`Error fetching all jobs`);
         }
     }
 }

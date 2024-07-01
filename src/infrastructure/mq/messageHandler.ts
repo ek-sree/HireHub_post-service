@@ -10,6 +10,18 @@ export default class MessageHandler {
                 response = await jobpostController.addNewJob(data)
                 break;
 
+                case 'get-recruiter-jobs':
+                    response = await jobpostController.fetchRecruiterJobs(data);
+                    break;
+
+                case 'get-all-jobs':
+                    response = await jobpostController.fetchAllJob();
+                    break;
+
+                case 'edit-job':
+                    response = await jobpostController.editJob(data);
+                    break;    
+
             default:
                 response = { error: "Operation not supported" };
                 break;

@@ -13,16 +13,24 @@ const jobpostSchema: Schema = new Schema({
         required: true
     },
     jobType: {
-        type: String,
+        type: [String],
         required: true
     },
     employmentType: {
-        type: String,
+        type: [String],
         required: true
     },
     skills: {
         type: [String],
         required: true
+    },
+    recruiterId: {
+        type: String,
+        required: true
+    },
+    companyName: {
+        type: String,
+        require: true
     },
     created_at: {
         type: Date,
