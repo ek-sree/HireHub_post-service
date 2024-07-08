@@ -44,9 +44,26 @@ export class JobpostRepository implements IJobpostRepository {
         }
     }
 
-    async findAllJobs(): Promise<IJobpost[]> {
+    async findAllJobs({employmentType, jobType, search}:{employmentType:string[],jobType:string[], search:string}): Promise<IJobpost[]> {
         try {
-            const data = await Jobpost.find();
+            console.log("ssshhooww",employmentType, jobType);
+            const query: any = {};
+        
+     
+            if (employmentType && employmentType.length > 0) {
+                query.employmentType = { $in: employmentType };
+            }
+    
+            if (jobType && jobType.length > 0) {
+                query.jobType = { $in: jobType };
+            }
+            
+            
+        if (search) {
+            query.place = { $regex: new RegExp(search, 'i') };
+        }
+
+            const data = await Jobpost.find(query);
             return data
         } catch (error) {
             const err = error as Error;

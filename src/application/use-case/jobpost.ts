@@ -1,6 +1,7 @@
 import { IJobpost } from "../../domain/entities/IJobpost";
 import { JobpostRepository } from "../../domain/repositories/JobpostRepository";
 
+
 class JobPostService {
     private jobpostRepo: JobpostRepository;
 
@@ -49,9 +50,10 @@ class JobPostService {
         }
     }
 
-    async getAllJobs(): Promise<{success:boolean, job?:IJobpost[]}> {
+    async getAllJobs({employmentType, jobType, searchValue}:{employmentType:string[], jobType:string[], searchValue:string}): Promise<{success:boolean, job?:IJobpost[]}> {
         try {
-            const response = await this.jobpostRepo.findAllJobs();
+            const search = searchValue.toUpperCase()
+            const response = await this.jobpostRepo.findAllJobs({employmentType, jobType, search});
             if(!response){
                 return {success: false}
             }

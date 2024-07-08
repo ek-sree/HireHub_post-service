@@ -15,7 +15,7 @@ export default class MessageHandler {
                     break;
 
                 case 'get-all-jobs':
-                    response = await jobpostController.fetchAllJob();
+                    response = await jobpostController.fetchAllJob(data);
                     break;
 
                 case 'edit-job':
