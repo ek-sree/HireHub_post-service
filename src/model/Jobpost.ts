@@ -32,6 +32,15 @@ const jobpostSchema: Schema = new Schema({
         type: String,
         require: true
     },
+    applications: {
+        type: [{
+            name: String,
+            email: String,
+            phone: String,
+            resume: String
+        }],
+        default: [],
+    },
     created_at: {
         type: Date,
         required: true,

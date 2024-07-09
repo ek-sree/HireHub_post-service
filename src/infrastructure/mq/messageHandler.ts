@@ -20,6 +20,14 @@ export default class MessageHandler {
 
                 case 'edit-job':
                     response = await jobpostController.editJob(data);
+                    break;  
+                    
+                case 'apply-job':
+                    response = await jobpostController.applyToJob(data);
+                    break;  
+                    
+                case 'view-application':
+                    response = await jobpostController.fetchedApplication(data);
                     break;    
 
             default:

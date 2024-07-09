@@ -49,6 +49,31 @@ class JobpostController {
             throw error;
         }
     }
+
+    async applyToJob(data:{jobId:string, name:string, email:string, phone: string, resumes:string}){
+        try {
+            const { jobId, name, email, phone, resumes } = data; 
+
+            console.log("Received data in applyToJob:", jobId, name, email, phone, resumes);
+            
+            const result = await jobpostService.applyJob(jobId,name,email,phone,resumes);
+            return result;
+        } catch (error) {
+            console.error("Error applying job:", error);
+            throw error;
+        }
+    }
+
+    async fetchedApplication(data:{jobId:string}){
+        try {
+            const jobId = data.jobId;
+            const result = await jobpostService.fetchApplication(jobId);
+            return result;
+        } catch (error) {
+            console.error("Error fetching applications:", error);
+            throw error;
+        }
+    }
 }
 
 export const jobpostController = new JobpostController();

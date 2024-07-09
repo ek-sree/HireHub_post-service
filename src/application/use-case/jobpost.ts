@@ -1,3 +1,4 @@
+import { IApplication } from "../../domain/entities/IApplication";
 import { IJobpost } from "../../domain/entities/IJobpost";
 import { JobpostRepository } from "../../domain/repositories/JobpostRepository";
 
@@ -80,6 +81,33 @@ class JobPostService {
             throw error;
         }
     }
-}
+
+    async applyJob(jobId:string, name:string, email:string, phone:string, resume:string): Promise<{success:boolean, message:string}>{
+        try {
+            const result = await this.jobpostRepo.createApplyJob({jobId,name, email,phone, resume});
+            if(!result){
+                return {success:false, message:"Cant apply right now"}
+            }
+            return {success:true, message:"Applied to job"}
+        } catch (error) {
+            console.error("Error in applying job:", error);
+            throw error;
+        }
+    }
+
+    async fetchApplication(jobId:string):Promise<{success:boolean, message:string,applications?:IApplication[]}>{
+        try {
+            const result = await this.jobpostRepo.findApplication(jobId)
+            if(!result){
+                return {success:false, message:"No application found"}
+            }
+            return {success:true, message:"Application found", applications:result.data}
+        } catch (error) {
+            console.error("Error in fetching jobs:", error);
+            throw error;
+        } 
+        }
+    }
+
 
 export const jobpostService = new JobPostService();

@@ -7,5 +7,6 @@ export interface IJobpost {
     skills:string[];
     companyName:string;
     recruiterId:string;
+    applications?: { name: string, email: string, phone:string, resume:string }[];
     created_at:Date;
 }

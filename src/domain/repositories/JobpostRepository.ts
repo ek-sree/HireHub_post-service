@@ -1,6 +1,8 @@
 import { IJobpost } from "../entities/IJobpost";
 import { IJobpostRepository } from "./IJobpostRepository";
 import { Jobpost } from "../../model/Jobpost";
+import { IApplication } from "../entities/IApplication";
+import mongoose from "mongoose";
 
 export class JobpostRepository implements IJobpostRepository {
     async save(jobpost: IJobpost): Promise<IJobpost> {
@@ -30,7 +32,6 @@ export class JobpostRepository implements IJobpostRepository {
             throw new Error("Invalid recruiterId type");
         }
 
-        console.log(actualRecruiterId, "sdsdfsdffds");
 
         try {
             const allJobs = await Jobpost.find({ recruiterId: actualRecruiterId });
@@ -89,4 +90,57 @@ export class JobpostRepository implements IJobpostRepository {
             throw new Error(`Error fetching all jobs`);
         }
     }
+
+    async createApplyJob({ jobId, name, email, phone, resume }: { jobId: string, name: string, email: string, phone: string, resume: string }): Promise<{ success: boolean, message: string }> {
+        try {
+            console.log("job Id", jobId);
+            
+            const job = await Jobpost.findById(jobId);
+            if (!job) {
+                return { success: false, message: "Can't find job" };
+            }
+            console.log("datasss",name,email,phone,resume);
+            
+            job.applications = job.applications || [];
+            job.applications.push({
+                name: name,
+                email: email,
+                phone: phone,
+                resume: resume
+            });
+console.log("done save this??");
+
+            await job.save();
+            return { success: true, message: "Application submitted successfully" };
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error apply jobs",err);
+            throw new Error(`Error applying jobs`);
+        }
+    }
+
+    async findApplication(jobId: string): Promise<{ success: boolean, message: string, data?: IApplication[] }> {
+        try {
+            // Validate the jobId format
+            if (!mongoose.Types.ObjectId.isValid(jobId)) {
+                console.log(`Invalid jobId format: ${jobId}`);
+                return { success: false, message: "Invalid jobId format" };
+            }
+    
+            const application = await Jobpost.findOne({ _id: new mongoose.Types.ObjectId(jobId) });
+            if (!application) {
+                return { success: false, message: "No job found" };
+            }
+    
+            const applications = application.applications;
+            console.log("kbs12343222222",applications);
+            
+            return { success: true, message: "Got application lists", data: applications };
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error showing application", err);
+            throw new Error(`Error viewing applications: ${err.message}`);
+        }
+    }
+    
 }
