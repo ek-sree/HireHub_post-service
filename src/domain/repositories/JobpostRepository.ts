@@ -35,7 +35,6 @@ export class JobpostRepository implements IJobpostRepository {
 
         try {
             const allJobs = await Jobpost.find({ recruiterId: actualRecruiterId });
-            console.log("found recruiter add job data from db", allJobs);
             
             return allJobs;
         } catch (error) {
@@ -106,7 +105,8 @@ export class JobpostRepository implements IJobpostRepository {
                 name: name,
                 email: email,
                 phone: phone,
-                resume: resume
+                resume: resume,
+                status:"pending"
             });
 console.log("done save this??");
 
@@ -121,7 +121,6 @@ console.log("done save this??");
 
     async findApplication(jobId: string): Promise<{ success: boolean, message: string, data?: IApplication[] }> {
         try {
-            // Validate the jobId format
             if (!mongoose.Types.ObjectId.isValid(jobId)) {
                 console.log(`Invalid jobId format: ${jobId}`);
                 return { success: false, message: "Invalid jobId format" };
@@ -132,14 +131,96 @@ console.log("done save this??");
                 return { success: false, message: "No job found" };
             }
     
-            const applications = application.applications;
-            console.log("kbs12343222222",applications);
+            const pendingapplication = application.applications?.filter(application=>application.status ==='pending');
             
-            return { success: true, message: "Got application lists", data: applications };
+            return { success: true, message: "Got application lists", data: pendingapplication };
         } catch (error) {
             const err = error as Error;
             console.log("Error showing application", err);
             throw new Error(`Error viewing applications: ${err.message}`);
+        }
+    }
+
+    async acceptApplication(jobId:string, applicationId:string): Promise<{success:boolean, message:string}>{
+        try {
+            if (!mongoose.Types.ObjectId.isValid(jobId)) {
+                console.log(`Invalid jobId format: ${jobId}`);
+                return { success: false, message: "Invalid jobId format" };
+            }
+            const job = await Jobpost.findOne({_id: new mongoose.Types.ObjectId(jobId)});
+            if(!job){
+                return {success: false, message:"cant find the job"}
+            }
+            const application = job.applications?.find(app=>app._id.toString() === applicationId)
+            if(!application){
+                return {success:false, message:"Cant find the application"}
+            }
+            application.status = 'accepted';
+            await job.save();
+            return {success:true, message:"status changed"}
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error accepting application", err);
+            throw new Error(`Error accepting applications: ${err.message}`);
+        }
+    }
+
+    async rejectApplication(jobId:string, applicationId:string): Promise<{success:boolean, message:string}>{
+        try {
+            if(!mongoose.Types.ObjectId.isValid(jobId)){
+                console.log(`Invalid jobId format: ${jobId}`);
+                return {success:false,message:"Invalid jobId formate"}
+            }
+            const job = await Jobpost.findOne({_id: new mongoose.Types.ObjectId(jobId)});
+            if(!job){
+                return {success:false, message:"no job found"}
+            }
+            
+            const application = job.applications?.find(app=>app._id.toString()===applicationId);
+            if(!application){
+                return {success:false, message:"No application found"}
+            }
+            
+            application.status = 'rejected';
+            await job.save();
+            
+            return {success:true, message:"rejected application"}
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error rejecting application", err);
+            throw new Error(`Error rejecting applications: ${err.message}`);
+        }
+    }
+
+    async findSelectedApplication(recruiterId: string): Promise<{ success: boolean, message: string, datas?: IApplication[] }> {
+        try {
+            const jobs = await Jobpost.find({ recruiterId: recruiterId });
+            if (!jobs) {
+                return { success: false, message: "No job found" };
+            }
+    
+            const acceptedApplications: IApplication[] = [];
+            const uniqueEmails = new Set<string>();
+    
+            jobs.forEach(job => {
+                const accepted = job.applications?.filter(app => app.status === 'accepted');
+                if (accepted && accepted.length > 0) {
+                    accepted.forEach(app => {
+                        if (!uniqueEmails.has(app.email)) {
+                            uniqueEmails.add(app.email);
+                            acceptedApplications.push(app);
+                        }
+                    });
+                }
+            });
+    
+            console.log("applica", acceptedApplications);
+    
+            return { success: true, message: "found applications", datas: acceptedApplications };
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error fetching selected applications", err);
+            throw new Error(`Error fetching selected applications: ${err.message}`);
         }
     }
     

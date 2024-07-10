@@ -28,6 +28,18 @@ export default class MessageHandler {
                     
                 case 'view-application':
                     response = await jobpostController.fetchedApplication(data);
+                    break; 
+                    
+                case 'accept-application':
+                    response = await jobpostController.acceptApplication(data)
+                    break; 
+                    
+                case 'reject-application':
+                    response = await jobpostController.rejectedApplication(data);
+                    break;
+                    
+                case 'shortlist-application':
+                    response = await jobpostController.shortlistedApplications(data);
                     break;    
 
             default:

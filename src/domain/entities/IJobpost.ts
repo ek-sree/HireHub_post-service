@@ -1,3 +1,5 @@
+import { IApplication } from "./IApplication";
+
 export interface IJobpost {
     jobId: string ;
     position:string;
@@ -7,6 +9,6 @@ export interface IJobpost {
     skills:string[];
     companyName:string;
     recruiterId:string;
-    applications?: { name: string, email: string, phone:string, resume:string }[];
+    applications?: IApplication[];
     created_at:Date;
 }

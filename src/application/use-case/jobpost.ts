@@ -35,7 +35,6 @@ class JobPostService {
     async getRecruiterJobs(recruiterId: string): Promise<{success: boolean, message:string, job?:IJobpost[]}> {
        try {
         const result = await this.jobpostRepo.findRecruiterJobs(recruiterId);
-        console.log(result,'/............');
         
         if(!result){
             return { success: false, message:"No Job post found" }
@@ -103,11 +102,51 @@ class JobPostService {
             }
             return {success:true, message:"Application found", applications:result.data}
         } catch (error) {
-            console.error("Error in fetching jobs:", error);
+            console.error("Error in fetching appliactions:", error);
             throw error;
         } 
         }
+
+    async acceptApplication(jobId:string, applicationId:string):Promise<{success:boolean, message:string}>{
+        try {
+            const result = await this.jobpostRepo.acceptApplication(jobId,applicationId)
+            if(!result){
+                return {success:false, message:"Cant accept application"}
+            }
+            return {success:true,message:"application status updated"}
+        } catch (error) {
+            console.error("Error in accpeting application:", error);
+            throw error;
+        } 
+    }   
+    
+    async rejectApplication(jobId:string, applicationId:string): Promise<{success:boolean, message:string}>{
+        try {
+            const result = await this.jobpostRepo.rejectApplication(jobId,applicationId);
+            if(!result){
+                return{success:false, message:"error occured rejecting application failed"}
+            }
+            return {success:true, message:"Rejected application successfully"}
+        } catch (error) {
+            console.error("Error in rejecting application:", error);
+            throw error;
+        } 
     }
+
+    async shortlistApplication(recruiterId:string): Promise<{success:boolean, message:string, candidates?:IApplication[]}>{
+        try {
+            const result = await this.jobpostRepo.findSelectedApplication(recruiterId);
+            if(!result){
+                return {success:false, message:"couldnt found accepcted applications"}
+            }
+            return {success:true, message:"applications found",candidates:result.datas }
+        } catch (error) {
+            console.error("Error fetching accepted application:", error);
+            throw error;
+        } 
+    }
+}
+
 
 
 export const jobpostService = new JobPostService();

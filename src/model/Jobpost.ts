@@ -34,13 +34,30 @@ const jobpostSchema: Schema = new Schema({
     },
     applications: {
         type: [{
-            name: String,
-            email: String,
-            phone: String,
-            resume: String
+          name: {
+            type: String,
+            required: true
+          },
+          email: {
+            type: String,
+            required: true
+          },
+          phone: {
+            type: String,
+            required: true
+          },
+          resume: {
+            type: String,
+            required: true
+          },
+          status: {
+            type: String,
+            default: "pending",
+            enum: ["pending", "accepted", "rejected"]
+          }
         }],
         default: [],
-    },
+      },
     created_at: {
         type: Date,
         required: true,

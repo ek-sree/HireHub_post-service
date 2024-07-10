@@ -74,6 +74,41 @@ class JobpostController {
             throw error;
         }
     }
+
+    async acceptApplication(data:{jobId:string, applicationId:string}){
+        try {
+            const {jobId, applicationId} = data
+            const result = await jobpostService.acceptApplication(jobId, applicationId)
+            return result;
+        } catch (error) {
+            console.error("Error accepting applications:", error);
+            throw error;
+        }
+    }
+
+    async rejectedApplication(data:{jobId:string, applicationId:string}){
+        try {
+            const {jobId, applicationId} = data;
+            const result = await jobpostService.rejectApplication(jobId, applicationId);
+            return result;
+        } catch (error) {
+            console.error("Error rejecting applications in controller:", error);
+            throw error;
+        }
+    }
+
+    async shortlistedApplications(data:{recruiterId:string}){
+        try {
+            
+            const recruiterId = data.recruiterId;
+            console.log("data controlllllerrt",recruiterId);
+            const result = await jobpostService.shortlistApplication(recruiterId);
+            return result;
+        } catch (error) {
+            console.error("Error fetching shortlisted application in controller:", error);
+            throw error;
+        }
+    }
 }
 
 export const jobpostController = new JobpostController();
