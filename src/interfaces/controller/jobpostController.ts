@@ -97,12 +97,23 @@ class JobpostController {
         }
     }
 
-    async shortlistedApplications(data:{recruiterId:string}){
+    async selectedApplications(data:{recruiterId:string}){
         try {
             
             const recruiterId = data.recruiterId;
             console.log("data controlllllerrt",recruiterId);
-            const result = await jobpostService.shortlistApplication(recruiterId);
+            const result = await jobpostService.selectApplication(recruiterId);
+            return result;
+        } catch (error) {
+            console.error("Error fetching application in controller:", error);
+            throw error;
+        }
+    }
+
+    async shortlistedCadidates(data:{jobId:string}){
+        try {
+            const jobId = data.jobId;
+            const result = await jobpostService.shorlistedApplication(jobId);
             return result;
         } catch (error) {
             console.error("Error fetching shortlisted application in controller:", error);

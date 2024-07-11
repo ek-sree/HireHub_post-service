@@ -20,6 +20,10 @@ const jobpostSchema: Schema = new Schema({
         type: [String],
         required: true
     },
+    experience:{
+      type:String,
+      require:true
+    },
     skills: {
         type: [String],
         required: true
@@ -54,14 +58,19 @@ const jobpostSchema: Schema = new Schema({
             type: String,
             default: "pending",
             enum: ["pending", "accepted", "rejected"]
+          },
+          created_at: {
+            type:Date, 
+            default: Date.now
           }
         }],
         default: [],
+
       },
     created_at: {
         type: Date,
         required: true,
-        default: Date.now
+        default: () => Date.now()
     }
 });
 

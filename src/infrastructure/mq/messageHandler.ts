@@ -38,8 +38,12 @@ export default class MessageHandler {
                     response = await jobpostController.rejectedApplication(data);
                     break;
                     
+                case 'all-cadidates':
+                    response = await jobpostController.selectedApplications(data);
+                    break;    
+
                 case 'shortlist-application':
-                    response = await jobpostController.shortlistedApplications(data);
+                    response = await jobpostController.shortlistedCadidates(data);
                     break;    
 
             default:

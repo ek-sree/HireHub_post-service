@@ -106,7 +106,8 @@ export class JobpostRepository implements IJobpostRepository {
                 email: email,
                 phone: phone,
                 resume: resume,
-                status:"pending"
+                status:"pending",
+                created_at:new Date()
             });
 console.log("done save this??");
 
@@ -224,4 +225,25 @@ console.log("done save this??");
         }
     }
     
+    async findShortListedCadidates(jobId:string):Promise<{success:boolean, message:string, data?:IApplication[]}>{
+        try {
+            if(!mongoose.Types.ObjectId.isValid(jobId)){
+                console.log(`Invalid jobId format: ${jobId}`);
+                return {success:false,message:"Invalid jobId formate"}
+            }
+            const job = await Jobpost.findOne({_id:new mongoose.Types.ObjectId(jobId)})
+            if(!jobId){
+                return { success: false, message: "No job found" };
+            }
+            const cadidates = job?.applications?.filter((app:IApplication)=>app.status === "accepted")
+            console.log("cadidates",cadidates);
+            return {success:true, message:"Cadidates fetched",data:cadidates}
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error fetching selected job applications", err);
+            throw new Error(`Error fetching selected job applications: ${err.message}`);
+        }
+    }
+
+    // async deleteJob(jobId:string)
 }

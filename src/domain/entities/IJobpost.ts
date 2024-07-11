@@ -6,6 +6,7 @@ export interface IJobpost {
     place:string;
     jobType:string;
     employmentType:string;
+    experience:string;
     skills:string[];
     companyName:string;
     recruiterId:string;

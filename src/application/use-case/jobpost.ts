@@ -133,7 +133,7 @@ class JobPostService {
         } 
     }
 
-    async shortlistApplication(recruiterId:string): Promise<{success:boolean, message:string, candidates?:IApplication[]}>{
+    async selectApplication(recruiterId:string): Promise<{success:boolean, message:string, candidates?:IApplication[]}>{
         try {
             const result = await this.jobpostRepo.findSelectedApplication(recruiterId);
             if(!result){
@@ -142,6 +142,19 @@ class JobPostService {
             return {success:true, message:"applications found",candidates:result.datas }
         } catch (error) {
             console.error("Error fetching accepted application:", error);
+            throw error;
+        } 
+    }
+
+    async shorlistedApplication(jobId:string):Promise<{success:boolean, message:string, Candidates?:IApplication[]}>{
+        try {
+            const result = await this.jobpostRepo.findShortListedCadidates(jobId);
+            if(!result){
+                return {success:false, message:"coundt found any data"}
+            }
+            return {success:true, message:"Data found", Candidates:result.data}
+        } catch (error) {
+            console.error("Error fetching shorlisted cadidates:", error);
             throw error;
         } 
     }

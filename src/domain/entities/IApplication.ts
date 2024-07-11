@@ -5,4 +5,5 @@ export interface IApplication{
     phone:string;
     resume:string;
     status:string;
+    created_at:Date;
 }
