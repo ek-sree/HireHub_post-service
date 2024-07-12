@@ -1,6 +1,7 @@
 import { IApplication } from "../../domain/entities/IApplication";
 import { IJobpost } from "../../domain/entities/IJobpost";
 import { JobpostRepository } from "../../domain/repositories/JobpostRepository";
+import { acceptJobMail, rejectJobMail } from "../../utils/jobStatusMail";
 
 
 class JobPostService {
@@ -94,24 +95,32 @@ class JobPostService {
         }
     }
 
-    async fetchApplication(jobId:string):Promise<{success:boolean, message:string,applications?:IApplication[]}>{
+    async fetchApplication(jobId: string, page: number, limit: number): Promise<{ success: boolean, message: string, applications?: IApplication[], totalUsers?: number }> {
         try {
-            const result = await this.jobpostRepo.findApplication(jobId)
-            if(!result){
-                return {success:false, message:"No application found"}
+            const result = await this.jobpostRepo.findApplication(jobId, page, limit);
+            if (!result) {
+                return { success: false, message: "No application found" };
             }
-            return {success:true, message:"Application found", applications:result.data}
+    
+            return { success: true, message: "Application found", applications: result.data, totalUsers: result.totalUsers };
         } catch (error) {
-            console.error("Error in fetching appliactions:", error);
+            console.error("Error in fetching applications:", error);
             throw error;
-        } 
         }
+    }
+    
 
     async acceptApplication(jobId:string, applicationId:string):Promise<{success:boolean, message:string}>{
         try {
             const result = await this.jobpostRepo.acceptApplication(jobId,applicationId)
             if(!result){
                 return {success:false, message:"Cant accept application"}
+            }
+            const companyName = result.data?.companyName;
+            const position = result.data?.position;
+            const toMail = result.email;
+            if(toMail && companyName && position){
+                await acceptJobMail(toMail,companyName, position)
             }
             return {success:true,message:"application status updated"}
         } catch (error) {
@@ -126,6 +135,12 @@ class JobPostService {
             if(!result){
                 return{success:false, message:"error occured rejecting application failed"}
             }
+            const companyName = result.data?.companyName;
+            const position = result.data?.position;
+            const email = result.email;
+            if(email && companyName && position){
+                await rejectJobMail(email,companyName,position)
+            } 
             return {success:true, message:"Rejected application successfully"}
         } catch (error) {
             console.error("Error in rejecting application:", error);
@@ -155,6 +170,19 @@ class JobPostService {
             return {success:true, message:"Data found", Candidates:result.data}
         } catch (error) {
             console.error("Error fetching shorlisted cadidates:", error);
+            throw error;
+        } 
+    }
+
+    async blockUnblockJob(jobId:string): Promise<{success:boolean, message?:string, isBlocked?:boolean}>{
+        try {
+            const result = await this.jobpostRepo.updateJobStatus(jobId);
+            if(!result){
+                return {success:false, message:"Cant change job status"}
+            }
+            return {success:true, message:result.message, isBlocked:result.updatedStatus}
+        } catch (error) {
+            console.error("Error updating job status:", error);
             throw error;
         } 
     }

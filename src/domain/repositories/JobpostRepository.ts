@@ -34,7 +34,7 @@ export class JobpostRepository implements IJobpostRepository {
 
 
         try {
-            const allJobs = await Jobpost.find({ recruiterId: actualRecruiterId });
+            const allJobs = await Jobpost.find({ recruiterId: actualRecruiterId }).sort({ created_at: -1 });;
             
             return allJobs;
         } catch (error) {
@@ -47,7 +47,7 @@ export class JobpostRepository implements IJobpostRepository {
     async findAllJobs({employmentType, jobType, search}:{employmentType:string[],jobType:string[], search:string}): Promise<IJobpost[]> {
         try {
             console.log("ssshhooww",employmentType, jobType);
-            const query: any = {};
+            const query: any = { isBlocked: false };
         
      
             if (employmentType && employmentType.length > 0) {
@@ -63,7 +63,7 @@ export class JobpostRepository implements IJobpostRepository {
             query.place = { $regex: new RegExp(search, 'i') };
         }
 
-            const data = await Jobpost.find(query);
+            const data = await Jobpost.find(query).sort({ created_at: -1 });;
             return data
         } catch (error) {
             const err = error as Error;
@@ -98,7 +98,6 @@ export class JobpostRepository implements IJobpostRepository {
             if (!job) {
                 return { success: false, message: "Can't find job" };
             }
-            console.log("datasss",name,email,phone,resume);
             
             job.applications = job.applications || [];
             job.applications.push({
@@ -109,7 +108,6 @@ export class JobpostRepository implements IJobpostRepository {
                 status:"pending",
                 created_at:new Date()
             });
-console.log("done save this??");
 
             await job.save();
             return { success: true, message: "Application submitted successfully" };
@@ -120,29 +118,35 @@ console.log("done save this??");
         }
     }
 
-    async findApplication(jobId: string): Promise<{ success: boolean, message: string, data?: IApplication[] }> {
+    async findApplication(jobId: string, page: number, limit: number): Promise<{ success: boolean, message: string, data?: IApplication[], totalUsers?: number }> {
         try {
             if (!mongoose.Types.ObjectId.isValid(jobId)) {
                 console.log(`Invalid jobId format: ${jobId}`);
                 return { success: false, message: "Invalid jobId format" };
             }
     
-            const application = await Jobpost.findOne({ _id: new mongoose.Types.ObjectId(jobId) });
-            if (!application) {
+            const skip = (page - 1) * limit;
+            const job = await Jobpost.findOne({ _id: new mongoose.Types.ObjectId(jobId) });
+    
+            if (!job) {
                 return { success: false, message: "No job found" };
             }
     
-            const pendingapplication = application.applications?.filter(application=>application.status ==='pending');
-            
-            return { success: true, message: "Got application lists", data: pendingapplication };
+            const pendingApplications = job.applications?.filter(app => app.status === 'pending') || [];
+            const totalUsers = pendingApplications.length;
+    
+            const paginatedApplications = pendingApplications.slice(skip, skip + limit);
+    
+            return { success: true, message: "Got application lists", data: paginatedApplications, totalUsers };
         } catch (error) {
             const err = error as Error;
             console.log("Error showing application", err);
             throw new Error(`Error viewing applications: ${err.message}`);
         }
     }
+    
 
-    async acceptApplication(jobId:string, applicationId:string): Promise<{success:boolean, message:string}>{
+    async acceptApplication(jobId:string, applicationId:string): Promise<{success:boolean, message:string, data?:IJobpost, email?:string}>{
         try {
             if (!mongoose.Types.ObjectId.isValid(jobId)) {
                 console.log(`Invalid jobId format: ${jobId}`);
@@ -157,8 +161,9 @@ console.log("done save this??");
                 return {success:false, message:"Cant find the application"}
             }
             application.status = 'accepted';
+            const email = application.email;
             await job.save();
-            return {success:true, message:"status changed"}
+            return {success:true, message:"status changed", data:job,email}
         } catch (error) {
             const err = error as Error;
             console.log("Error accepting application", err);
@@ -166,7 +171,7 @@ console.log("done save this??");
         }
     }
 
-    async rejectApplication(jobId:string, applicationId:string): Promise<{success:boolean, message:string}>{
+    async rejectApplication(jobId:string, applicationId:string): Promise<{success:boolean, message:string, data?:IJobpost, email?:string}>{
         try {
             if(!mongoose.Types.ObjectId.isValid(jobId)){
                 console.log(`Invalid jobId format: ${jobId}`);
@@ -183,9 +188,10 @@ console.log("done save this??");
             }
             
             application.status = 'rejected';
+            const email = application.email;
             await job.save();
             
-            return {success:true, message:"rejected application"}
+            return {success:true, message:"rejected application",data:job, email}
         } catch (error) {
             const err = error as Error;
             console.log("Error rejecting application", err);
@@ -245,5 +251,24 @@ console.log("done save this??");
         }
     }
 
-    // async deleteJob(jobId:string)
+    async updateJobStatus(jobId:string):Promise<{success:boolean, message:string, updatedStatus?:boolean}>{
+        try {
+            if(!mongoose.Types.ObjectId.isValid(jobId)){
+                console.log(`Invalid jobId format: ${jobId}`);
+                return {success:false,message:"Invalid jobId formate"}
+            }
+        
+            const job = await Jobpost.findOne({_id:new mongoose.Types.ObjectId(jobId)});
+            if(!job){
+                return {success:false, message:"No job found"}
+            }
+            job.isBlocked = !job.isBlocked
+            await job.save();
+            return {success:true, message:`${job.isBlocked?"Blocked" :"Unblocked"} now`, updatedStatus:job.isBlocked}
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error updating jobs", err);
+            throw new Error(`Error updating jobs: ${err.message}`);
+        }
+    }
 }

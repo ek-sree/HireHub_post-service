@@ -53,8 +53,6 @@ class JobpostController {
     async applyToJob(data:{jobId:string, name:string, email:string, phone: string, resumes:string}){
         try {
             const { jobId, name, email, phone, resumes } = data; 
-
-            console.log("Received data in applyToJob:", jobId, name, email, phone, resumes);
             
             const result = await jobpostService.applyJob(jobId,name,email,phone,resumes);
             return result;
@@ -64,10 +62,14 @@ class JobpostController {
         }
     }
 
-    async fetchedApplication(data:{jobId:string}){
+    async fetchedApplication(data:{jobId:string, page:number, limit:number}){
         try {
             const jobId = data.jobId;
-            const result = await jobpostService.fetchApplication(jobId);
+            const page = data.page;
+            const limit = data.limit;
+            const result = await jobpostService.fetchApplication(jobId, page, limit);
+            console.log("333333",result);
+            
             return result;
         } catch (error) {
             console.error("Error fetching applications:", error);
@@ -117,6 +119,18 @@ class JobpostController {
             return result;
         } catch (error) {
             console.error("Error fetching shortlisted application in controller:", error);
+            throw error;
+        }
+    }
+
+    async updateJobStatus(data:{jobId: string}){
+        console.log("data soft delete", data);
+        try {
+            const jobId = data.jobId;
+            const result = await jobpostService.blockUnblockJob(jobId);
+            return result;
+        } catch (error) {
+            console.error("Error updating job status in controller:", error);
             throw error;
         }
     }

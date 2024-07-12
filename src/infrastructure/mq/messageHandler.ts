@@ -44,6 +44,10 @@ export default class MessageHandler {
 
                 case 'shortlist-application':
                     response = await jobpostController.shortlistedCadidates(data);
+                    break;  
+                    
+                case 'update-job-status':
+                    response = await jobpostController.updateJobStatus(data);
                     break;    
 
             default:

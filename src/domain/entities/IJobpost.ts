@@ -11,5 +11,6 @@ export interface IJobpost {
     companyName:string;
     recruiterId:string;
     applications?: IApplication[];
+    isBlocked:boolean;
     created_at:Date;
 }

@@ -67,6 +67,10 @@ const jobpostSchema: Schema = new Schema({
         default: [],
 
       },
+      isBlocked:{
+        type:Boolean,
+        default:false
+      },
     created_at: {
         type: Date,
         required: true,
