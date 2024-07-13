@@ -1,4 +1,5 @@
 import { jobpostController } from '../../interfaces/controller/jobpostController';
+import { postController } from '../../interfaces/controller/postController';
 import RabbitMQClient from './client';
 
 export default class MessageHandler {
@@ -6,7 +7,8 @@ export default class MessageHandler {
         let response;
 
         switch (operation) {
-            case 'add-new-job':
+
+                case 'add-new-job':
                 response = await jobpostController.addNewJob(data)
                 break;
 
@@ -48,6 +50,10 @@ export default class MessageHandler {
                     
                 case 'update-job-status':
                     response = await jobpostController.updateJobStatus(data);
+                    break;    
+
+                case 'create-post':
+                    response = await postController.addPost(data);
                     break;    
 
             default:

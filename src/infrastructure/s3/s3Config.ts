@@ -6,11 +6,11 @@ if (!config.bucketAccessKey || !config.bucketAccessPassword || !config.bucketReg
 }
 
 const s3 = new S3Client({
-    credentials:{
+    credentials: {
         accessKeyId: config.bucketAccessKey,
         secretAccessKey: config.bucketAccessPassword,
     },
-    region: config.bucketRegion
+    region: config.bucketRegion,
 });
 
 export default s3;
