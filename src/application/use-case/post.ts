@@ -1,6 +1,7 @@
 import { IAddPostData, IPost, ISavePostData } from "../../domain/entities/IPost";
 import { PostRepository } from "../../domain/repositories/PostRepository";
-import { uploadFileToS3 } from "../../infrastructure/s3/s3Actions";
+import { fetchFileFromS3, uploadFileToS3 } from "../../infrastructure/s3/s3Actions";
+import { Document } from 'mongoose';
 
 class PostService {
     private postRepo: PostRepository;
@@ -42,6 +43,38 @@ class PostService {
             throw new Error(`Error saving post: ${error instanceof Error ? error.message : "Unknown error"}`);
         }
     }
+
+    async getAllPosts(): Promise<{ success: boolean, message: string, data?: IPost[] }> {
+        try {
+            const result = await this.postRepo.findAllPost();
+            if (!result.success || !result.data) {
+                return { success: false, message: "No data found" };
+            }
+    
+            const postsWithImages = await Promise.all(result.data.map(async (post) => {
+                if (post.imageUrl && post.imageUrl.length > 0) {
+                    const imageUrls = await Promise.all(post.imageUrl.map(async (imageKey) => {
+                        const s3Url = await fetchFileFromS3(imageKey, 604800);
+                        return s3Url;
+                    }));
+    
+                    const plainPost = (post as Document).toObject();
+    
+                    return {
+                        ...plainPost,
+                        imageUrl: imageUrls,
+                    };
+                }
+                return post;
+            }));
+    
+            return { success: true, message: "Images and all data sent", data: postsWithImages };
+        } catch (error) {
+            console.error("Error in getAllPosts:", error);
+            throw new Error(`Error fetching posts: ${error instanceof Error ? error.message : "Unknown error"}`);
+        }
+    }
+    
 }
 
 export { PostService };

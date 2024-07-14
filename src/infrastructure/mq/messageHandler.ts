@@ -56,6 +56,10 @@ export default class MessageHandler {
                     response = await postController.addPost(data);
                     break;    
 
+                case 'get-all-posts':
+                    response = await postController.fetchedAllPosts();
+                    break;    
+
             default:
                 response = { error: "Operation not supported" };
                 break;

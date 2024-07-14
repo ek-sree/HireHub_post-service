@@ -10,7 +10,7 @@ export class PostRepository implements IPostRepository {
             const newPost = new Post({
                 UserId: post.userId,
                 description: post.description,
-                ImageUrl: post.imageUrl, 
+                imageUrl: post.imageUrl, 
                 originalname: post.originalname,
             });
 
@@ -18,13 +18,26 @@ export class PostRepository implements IPostRepository {
             if (!savedPost) {
                 return { success: false, message: "Can't save data" };
             }
-            console.log("saved fileeee",savedPost);
             
             return { success: true, message: "Data saved successfully", data: savedPost };
         } catch (error) {
             const err = error as Error;
-            console.log("Error saving data", err);
+            console.log("Error saving posts", err);
             throw new Error(`Error saving post: ${err.message}`);
+        }
+    }
+
+    async findAllPost():Promise<{success:boolean,message:string, data?:IPost[]}>{
+        try {
+            const posts = await Post.find({isDelete:false}).sort({created_at: -1});
+            if(!posts){
+                return {success:false, message:"No posts found"}
+            }
+            return {success:true, message:"Posts found", data:posts}
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error fetching all post", err);
+            throw new Error(`Error fetching post: ${err.message}`);
         }
     }
 }

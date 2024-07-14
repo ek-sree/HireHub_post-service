@@ -1,10 +1,14 @@
-export interface IPost {
+import { Document } from 'mongoose';
+
+export interface IPost extends Document {
     UserId: string;
-    imageUrl?: string[];
-    originalname?: string[];
+    imageUrl: string[];
+    originalname: string[];
     description: string;
-    likes?: { userId: string; createdAt: Date }[];
-    comments?: { userId: string; content: string; created_at: Date }[];
+    isDelete: boolean;
+    likes: string[];
+    comments: string[];
+    created_at: Date;
 }
 
 

@@ -20,6 +20,16 @@ class PostController {
             throw error;
         }
     }
+
+    async fetchedAllPosts(){
+        try {
+            const result = await this.postService.getAllPosts();
+            return result;
+        } catch (error) {
+            console.error("Error fetching posts:", error);
+            throw error;
+        }
+    }
 }
 
 export const postController = new PostController();

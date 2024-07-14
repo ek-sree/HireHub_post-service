@@ -8,7 +8,7 @@ const postSchema: Schema = new Schema({
         type: String,
         required: true,
     },
-    ImageUrl: {
+    imageUrl: {
         type: [String],
     },
     originalname: {
@@ -49,6 +49,10 @@ const postSchema: Schema = new Schema({
         type: Boolean,
         default: false,
     },
+    created_at:{
+        type:Date,
+        default:Date.now
+    }
 });
 
 export const Post = mongoose.model<IPostDocument>("Post", postSchema);
