@@ -74,6 +74,33 @@ class PostService {
             throw new Error(`Error fetching posts: ${error instanceof Error ? error.message : "Unknown error"}`);
         }
     }
+
+    async getUserPosts(userId:string):Promise<{success:boolean, message:string, data?:IPost[]}>{
+        try {
+            const result = await this.postRepo.findUserPosts(userId);
+            if(!result.success || !result.data){
+                return {success:false, message:"No posts found"}
+            }
+            const postsWithImages = await Promise.all(result.data?.map(async (post)=>{
+                if(post.imageUrl && post.imageUrl.length > 0){
+                    const imageUrls = await Promise.all(post.imageUrl.map(async (imageKey)=>{
+                        const s3Url = await await fetchFileFromS3(imageKey, 604800);
+                        return s3Url
+                    }))
+                    const plainPost = (post as Document).toObject();
+                    return {
+                        ...plainPost, imageUrl: imageUrls,
+                    };
+                }
+                return post;
+            }))
+            return { success: true, message: "Images and user datas sent", data: postsWithImages };
+
+        } catch (error) {
+            console.error("Error in user Posts:", error);
+            throw new Error(`Error fetching user posts: ${error instanceof Error ? error.message : "Unknown error"}`);
+        }
+    }
     
 }
 

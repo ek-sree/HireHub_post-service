@@ -58,6 +58,10 @@ export default class MessageHandler {
 
                 case 'get-all-posts':
                     response = await postController.fetchedAllPosts();
+                    break; 
+                    
+                case 'fetch-user-posts':
+                    response = await postController.fethedUserPosts(data);
                     break;    
 
             default:

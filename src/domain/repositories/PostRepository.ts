@@ -40,4 +40,26 @@ export class PostRepository implements IPostRepository {
             throw new Error(`Error fetching post: ${err.message}`);
         }
     }
+
+    async findUserPosts(userId: string): Promise<{ success: boolean, message: string, data?: IPost[] }> {
+        try {
+            const userIdStr = String(userId);
+    
+            console.log("userId", typeof userIdStr); 
+            console.log("userId",userIdStr); 
+    
+            const posts = await Post.find({ UserId: userIdStr }).sort({ created_at: -1 });
+            if (!posts || posts.length === 0) {
+                return { success: false, message: "No posts found" };
+            }
+    
+            console.log("post", posts); 
+    
+            return { success: true, message: "Posts found", data: posts };
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error fetching users post", err);
+            throw new Error(`Error fetching users post: ${err.message}`);
+        }
+    }
 }

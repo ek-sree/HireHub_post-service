@@ -30,6 +30,17 @@ class PostController {
             throw error;
         }
     }
+
+    async fethedUserPosts(data:{userId:string}){
+        try {
+            const userId = data.userId;
+            const result = await this.postService.getUserPosts(userId);
+            return result;
+        } catch (error) {
+            console.error("Error fetching user posts:", error);
+            throw error;
+        }
+    }
 }
 
 export const postController = new PostController();
