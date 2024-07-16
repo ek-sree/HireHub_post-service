@@ -46,9 +46,9 @@ export class JobpostRepository implements IJobpostRepository {
 
     async findAllJobs({employmentType, jobType, search}:{employmentType:string[],jobType:string[], search:string}): Promise<IJobpost[]> {
         try {
-            console.log("ssshhooww",employmentType, jobType);
+            console.log("search",search);
+            
             const query: any = { isBlocked: false };
-        
      
             if (employmentType && employmentType.length > 0) {
                 query.employmentType = { $in: employmentType };
