@@ -51,22 +51,23 @@ class JobPostService {
         }
     }
 
-    async getAllJobs({employmentType, jobType, searchValue}:{employmentType:string[], jobType:string[], searchValue:string}): Promise<{success:boolean, job?:IJobpost[]}> {
+    async getAllJobs({ employmentType, jobType, searchValue }: { employmentType: string[], jobType: string[], searchValue: string }): Promise<{ success: boolean, job?: IJobpost[] }> {
         try {
-            const search = searchValue.toUpperCase()
-            const response = await this.jobpostRepo.findAllJobs({employmentType, jobType, search});
-            if(!response){
-                return {success: false}
+            const search = searchValue.toUpperCase();
+            const response = await this.jobpostRepo.findAllJobs({ employmentType, jobType, search });
+            if (!response) {
+                return { success: false };
             }
-            return {success: true, job:response}
+            return { success: true, job: response };
         } catch (error) {
-            if(error instanceof Error) {
+            if (error instanceof Error) {
                 throw new Error(`Error fetching all job post: ${error.message}`);
-            }else{
-                throw new Error("Unknown error occured");
+            } else {
+                throw new Error("Unknown error occurred");
             }
         }
     }
+    
 
     async editJob(data: { jobData: IJobpost }): Promise<{success: boolean, message: string, job?:IJobpost}> {
         try {

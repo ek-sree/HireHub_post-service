@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Post } from "../../model/Post";
 import { IPost, ISavePostData } from "../entities/IPost";
 import { IPostRepository } from "./IPostRepository";
@@ -27,9 +28,11 @@ export class PostRepository implements IPostRepository {
         }
     }
 
-    async findAllPost():Promise<{success:boolean,message:string, data?:IPost[]}>{
+    async findAllPost(page:number):Promise<{success:boolean,message:string, data?:IPost[]}>{
         try {
-            const posts = await Post.find({isDelete:false}).sort({created_at: -1});
+            const limit = 2;
+            const skip = (page - 1)* limit;
+            const posts = await Post.find({isDelete:false}).sort({created_at: -1}).skip(skip).limit(limit);
             if(!posts){
                 return {success:false, message:"No posts found"}
             }
@@ -45,21 +48,57 @@ export class PostRepository implements IPostRepository {
         try {
             const userIdStr = String(userId);
     
-            console.log("userId", typeof userIdStr); 
-            console.log("userId",userIdStr); 
-    
             const posts = await Post.find({ UserId: userIdStr }).sort({ created_at: -1 });
             if (!posts || posts.length === 0) {
                 return { success: false, message: "No posts found" };
-            }
-    
-            console.log("post", posts); 
-    
+            }    
             return { success: true, message: "Posts found", data: posts };
         } catch (error) {
             const err = error as Error;
             console.log("Error fetching users post", err);
             throw new Error(`Error fetching users post: ${err.message}`);
+        }
+    }
+
+    async updateLikePost(postId:string, userId:string): Promise<{success:boolean, message:string, data?:{userId:string, createdAt:Date}[]}>{
+        try {
+            const post = await Post.findOne({_id: new mongoose.Types.ObjectId(postId)});
+            if(!post){
+                return {success:false, message:"No post found"}
+            }
+            
+            console.log("Likes id",userId);
+            if(!post.likes){
+                post.likes = [];
+            }
+            const alreadyLiked = post.likes.some(like => like.userId === userId);
+            if (alreadyLiked) {
+                return { success: false, message: "User has already liked this post" };
+            }
+    
+            post.likes.push({ userId, createdAt: new Date() });
+            await post.save();
+            return {success:true, message:"post liked",data:post.likes}
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error updating likes users post", err);
+            throw new Error(`Error updating likes users post: ${err.message}`);
+        }
+    }
+
+    async updateUnlikePost(postId:string, userId:string):Promise<{success:boolean, message:string, data?:{userId:string, createdAt:Date}[]}>{
+        try {
+            const post = await Post.findOne({_id: new mongoose.Types.ObjectId(postId)});
+            if(!post){
+                return {success:false,  message:"No post found"}
+            }
+            post.likes =  post.likes?.filter((like)=>like.userId!==userId);
+            await post.save();
+            return {success:true, message:"Unliked post", data:post.likes}
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error updating unlikes users post", err);
+            throw new Error(`Error updating unlikes users post: ${err.message}`);
         }
     }
 }

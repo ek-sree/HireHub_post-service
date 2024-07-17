@@ -44,9 +44,9 @@ class PostService {
         }
     }
 
-    async getAllPosts(): Promise<{ success: boolean, message: string, data?: IPost[] }> {
+    async getAllPosts(page:number): Promise<{ success: boolean, message: string, data?: IPost[] }> {
         try {
-            const result = await this.postRepo.findAllPost();
+            const result = await this.postRepo.findAllPost(page);
             if (!result.success || !result.data) {
                 return { success: false, message: "No data found" };
             }
@@ -99,6 +99,32 @@ class PostService {
         } catch (error) {
             console.error("Error in user Posts:", error);
             throw new Error(`Error fetching user posts: ${error instanceof Error ? error.message : "Unknown error"}`);
+        }
+    }
+
+    async likePost(postId:string, userId:string):Promise<{success:boolean, message:string,data?:{userId:string, createdAt:Date}[]}>{
+        try {
+            const result = await this.postRepo.updateLikePost(postId,userId);
+            if(!result.success || !result.data){
+                return {success:result.success, message:result.message}
+            }
+            return {success:result.success, message:result.message, data:result.data}
+        } catch (error) {
+            console.error("Error in liking user Posts:", error);
+            throw new Error(`Error liking user posts: ${error instanceof Error ? error.message : "Unknown error"}`);
+        }
+    }
+
+    async unlikePost(postId:string, userId:string):Promise<{success:boolean, message:string, data?:{userId:string, createdAt:Date}[]}>{
+        try {
+            const result = await this.postRepo.updateUnlikePost(postId, userId);
+            if(!result.data || !result.success){
+                return {success:result.success, message:result.message}
+            }
+            return {success:result.success, message:result.message, data:result.data}
+        } catch (error) {
+            console.error("Error in unliking user Posts:", error);
+            throw new Error(`Error unliking user posts: ${error instanceof Error ? error.message : "Unknown error"}`);
         }
     }
     

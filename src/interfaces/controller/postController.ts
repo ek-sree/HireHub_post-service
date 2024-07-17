@@ -21,9 +21,10 @@ class PostController {
         }
     }
 
-    async fetchedAllPosts(){
+    async fetchedAllPosts(data:{page:number}){
         try {
-            const result = await this.postService.getAllPosts();
+            const page = data.page;
+            const result = await this.postService.getAllPosts(page);
             return result;
         } catch (error) {
             console.error("Error fetching posts:", error);
@@ -38,6 +39,32 @@ class PostController {
             return result;
         } catch (error) {
             console.error("Error fetching user posts:", error);
+            throw error;
+        }
+    }
+
+    async likePost(data:{postId:string, userId:string}){
+        try {
+            const postId = data.postId;
+            const userId = data.userId;
+            console.log("userID like",userId);
+            
+            const result = await this.postService.likePost(postId,userId);
+            return result;
+        } catch (error) {
+            console.error("Error liking user posts:", error);
+            throw error;
+        }
+    }
+
+    async unlikePost(data:{postId:string, userId:string}){
+        try {
+            const postId = data.postId;
+            const userId = data.userId;
+            const result = await this.postService.unlikePost(postId,userId);
+            return result;
+        } catch (error) {
+            console.error("Error unliking user posts:", error);
             throw error;
         }
     }

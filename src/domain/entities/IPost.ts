@@ -6,8 +6,15 @@ export interface IPost extends Document {
     originalname: string[];
     description: string;
     isDelete: boolean;
-    likes: string[];
-    comments: string[];
+    likes?: Array<{
+        userId: string;
+        createdAt: Date;
+    }>;
+    comments?: Array<{
+        userId: string;
+        content: string;
+        created_at: Date;
+    }>;
     created_at: Date;
 }
 

@@ -25,20 +25,20 @@ class JobpostController {
         }
     }
 
-    async fetchAllJob(data:{employmentType:string[], jobType:string[], searchPlace: string}) {
+    async fetchAllJob(data: { employmentType: string[], jobType: string[], searchPlace: string}) {
         try {
             const employmentType = data.employmentType;
             const jobType = data.jobType;
-            const searchValue = data.searchPlace
-            console.log("emp,job data",employmentType, jobType,searchValue);
-            
-            const result = await jobpostService.getAllJobs({employmentType, jobType, searchValue});
+            const searchValue = data.searchPlace;  
+    
+            const result = await jobpostService.getAllJobs({ employmentType, jobType, searchValue});
             return result;
         } catch (error) {
-            console.log("Error fetching all job:",error);
+            console.log("Error fetching all job:", error);
             throw error;
         }
     }
+    
 
     async editJob(data: { jobData: IJobpost}) {
         try {
