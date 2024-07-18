@@ -1,6 +1,6 @@
 import { IAddPostData, IPost, ISavePostData } from "../../domain/entities/IPost";
 import { PostRepository } from "../../domain/repositories/PostRepository";
-import { fetchFileFromS3, uploadFileToS3 } from "../../infrastructure/s3/s3Actions";
+import { deleteFileFromS3, fetchFileFromS3, uploadFileToS3 } from "../../infrastructure/s3/s3Actions";
 import { Document } from 'mongoose';
 
 class PostService {
@@ -102,9 +102,9 @@ class PostService {
         }
     }
 
-    async likePost(postId:string, userId:string):Promise<{success:boolean, message:string,data?:{userId:string, createdAt:Date}[]}>{
+    async likePost(postId:string, UserId:string):Promise<{success:boolean, message:string,data?:{UserId:string, createdAt:Date}[]}>{
         try {
-            const result = await this.postRepo.updateLikePost(postId,userId);
+            const result = await this.postRepo.updateLikePost(postId,UserId);
             if(!result.success || !result.data){
                 return {success:result.success, message:result.message}
             }
@@ -115,7 +115,7 @@ class PostService {
         }
     }
 
-    async unlikePost(postId:string, userId:string):Promise<{success:boolean, message:string, data?:{userId:string, createdAt:Date}[]}>{
+    async unlikePost(postId:string, userId:string):Promise<{success:boolean, message:string, data?:{UserId:string, createdAt:Date}[]}>{
         try {
             const result = await this.postRepo.updateUnlikePost(postId, userId);
             if(!result.data || !result.success){
@@ -127,6 +127,67 @@ class PostService {
             throw new Error(`Error unliking user posts: ${error instanceof Error ? error.message : "Unknown error"}`);
         }
     }
+
+    async addComment(postId:string,UserId:string, comments:string):Promise<{success:boolean, message:string, data?:{UserId:string, content:string,createdAt:Date}[]}>{
+        try {
+            const result = await this.postRepo.createComment(postId, UserId, comments);
+            if(!result || !result.success){
+                return {success:result.success, message:result.message}
+            }
+            return {success:result.success, message:result.message, data:result.data}
+        } catch (error) {
+            console.error("Error in commenting user Posts:", error);
+            throw new Error(`Error commenting user posts: ${error instanceof Error ? error.message : "Unknown error"}`);
+        }
+    }
+
+    async fetchComments(postId:string):Promise<{success:boolean, message:string, data?:{UserId:string, content:string,createdAt:Date}[]}>{
+        try {
+            const result = await this.postRepo.findComments(postId);
+            if(!result || !result.success){
+                return {success:result.success, message:result.message}
+            }
+            return {success:result.success, message:result.message, data:result.data}
+        } catch (error) {
+            console.error("Error fetching comment user Posts:", error);
+            throw new Error(`Error fetching comment user posts: ${error instanceof Error ? error.message : "Unknown error"}`);
+        }
+    }
+
+    async removeComment(id:string, postId:string):Promise<{success:boolean, message:string, data?:{UserId:string, content:string, createdAt:Date}[]}>{
+        try {
+            const result = await this.postRepo.deleteComment(id,postId);
+            if(!result || !result.success){
+                return {success:result.success, message:result.message}
+            }
+            return {success:result.success, message:result.message, data:result.data}
+        } catch (error) {
+            console.error("Error deleting comment:", error);
+            throw new Error(`Error deleting comment: ${error instanceof Error ? error.message : "Unknown error"}`);
+        }
+    }
+
+    async removePost(postId: string, imageUrl: string): Promise<{ success: boolean, message: string, data?: IPost[] }> {
+        try {
+            const result = await this.postRepo.deletePost(postId);
+            if (!result || !result.success) {
+                return { success: result.success, message: result.message };
+            }
+    
+            console.log("Deleting from S3:", imageUrl);
+            const response = await deleteFileFromS3(imageUrl);
+    
+            if (!response.success) {
+                return { success: false, message: "Can't delete file from S3" };
+            }
+    
+            return { success: true, message: result.message, data: result.data };
+        } catch (error) {
+            console.error("Error deleting posts:", error);
+            throw new Error(`Error deleting posts: ${error instanceof Error ? error.message : "Unknown error"}`);
+        }
+    }
+    
     
 }
 

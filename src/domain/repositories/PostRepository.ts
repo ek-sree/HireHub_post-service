@@ -60,45 +60,109 @@ export class PostRepository implements IPostRepository {
         }
     }
 
-    async updateLikePost(postId:string, userId:string): Promise<{success:boolean, message:string, data?:{userId:string, createdAt:Date}[]}>{
+    async updateLikePost(postId: string, UserId: string) {
         try {
+          const post = await Post.findOneAndUpdate(
+            { _id: postId },
+            { $addToSet: { likes: { UserId, createdAt: new Date() } } },
+            { new: true }
+          );
+      
+    if (!post) {
+        return { success: false, message: "Post not found" };
+      }
+          return { success: true, message: "Post liked", data: post.likes };
+        } catch (error) {
+          console.error("Error updating likes:", error);
+          throw new Error("Error updating likes");
+        }
+      }
+      
+      async updateUnlikePost(postId: string, UserId: string) {
+        try {
+          const post = await Post.findOneAndUpdate(
+            { _id: postId },
+            { $pull: { likes: { UserId } } },
+            { new: true }
+          );
+
+    if (!post) {
+        return { success: false, message: "Post not found" };
+      }
+      
+          return { success: true, message: "Post unliked", data: post.likes };
+        } catch (error) {
+          console.error("Error updating unlikes:", error);
+          throw new Error("Error updating unlikes");
+        }
+      }
+
+    async createComment(postId:string,UserId:string, comments:string):Promise<{success:boolean, message:string, data?:{UserId:string, content:string,createdAt:Date}[]}>{
+        try {
+            
             const post = await Post.findOne({_id: new mongoose.Types.ObjectId(postId)});
             if(!post){
                 return {success:false, message:"No post found"}
             }
-            
-            console.log("Likes id",userId);
-            if(!post.likes){
-                post.likes = [];
-            }
-            const alreadyLiked = post.likes.some(like => like.userId === userId);
-            if (alreadyLiked) {
-                return { success: false, message: "User has already liked this post" };
-            }
-    
-            post.likes.push({ userId, createdAt: new Date() });
+            post.comments?.push({UserId, content:comments, createdAt: new Date()});
             await post.save();
-            return {success:true, message:"post liked",data:post.likes}
+            return {success:true, message:"Commented successfully", data:post.comments}
         } catch (error) {
             const err = error as Error;
-            console.log("Error updating likes users post", err);
-            throw new Error(`Error updating likes users post: ${err.message}`);
+            console.log("Error updating comments in users post", err);
+            throw new Error(`Error updating comments in users post: ${err.message}`);
         }
     }
 
-    async updateUnlikePost(postId:string, userId:string):Promise<{success:boolean, message:string, data?:{userId:string, createdAt:Date}[]}>{
+    async findComments(postId: string): Promise<{ success: boolean, message: string, data?: { UserId: string, content: string, createdAt: Date }[] }> {
+        try {
+            console.log("postId comment fetch",postId);
+            
+            const post = await Post.findById(new mongoose.Types.ObjectId(postId));
+            
+            if (!post) {
+                return { success: false, message: "No post found" };
+            }
+            return { success: true, message: "Comments found", data: post.comments };
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error fetching comments in users post", err);
+            throw new Error(`Error fetching comments in users post: ${err.message}`);
+        }
+    }
+
+    async deleteComment(id: string, postId: string): Promise<{ success: boolean, message: string, data?: { UserId: string, content: string, createdAt: Date }[] }> {
+        try {
+            console.log("delete idsssssss",id,postId);
+            
+            const post = await Post.findOne({ _id: new mongoose.Types.ObjectId(postId) });
+            if (!post) {
+                return { success: true, message: "Couldn't find posts" };
+            }
+            post.comments = post.comments?.filter(comment => comment._id && comment._id.toString() !== id);
+            await post.save();
+            return { success: true, message: "Comment deleted", data: post.comments };
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error deleting comment", err);
+            throw new Error(`Error deleting comment: ${err.message}`);
+        }
+    }
+
+    async deletePost(postId:string):Promise<{success:boolean, message:string, data?:IPost[]}>{
         try {
             const post = await Post.findOne({_id: new mongoose.Types.ObjectId(postId)});
             if(!post){
-                return {success:false,  message:"No post found"}
+                return {success:false, message:"no post found"}
             }
-            post.likes =  post.likes?.filter((like)=>like.userId!==userId);
-            await post.save();
-            return {success:true, message:"Unliked post", data:post.likes}
+            const deletedPost: IPost = post.toObject(); 
+            await Post.deleteOne({ _id: postId });
+            return {success:true, message:"Post deleted successfully", data:[deletedPost]}
         } catch (error) {
             const err = error as Error;
-            console.log("Error updating unlikes users post", err);
-            throw new Error(`Error updating unlikes users post: ${err.message}`);
+            console.log("Error deleting posts", err);
+            throw new Error(`Error deleting posts: ${err.message}`);
         }
     }
+    
 }

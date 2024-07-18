@@ -19,7 +19,7 @@ const postSchema: Schema = new Schema({
     },
     likes: [
         {
-            userId: {
+            UserId: {
                 type: String,
                 required: true,
             },
@@ -31,7 +31,8 @@ const postSchema: Schema = new Schema({
     ],
     comments: [
         {
-            userId: {
+            _id: { type: Schema.Types.ObjectId, auto: true },
+            UserId: {
                 type: String,
                 required: true,
             },
@@ -39,7 +40,7 @@ const postSchema: Schema = new Schema({
                 type: String,
                 required: true,
             },
-            created_at: {
+            createdAt: {
                 type: Date,
                 default: Date.now,
             },

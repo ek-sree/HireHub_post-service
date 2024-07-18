@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 
 export interface IPost extends Document {
     UserId: string;
@@ -7,13 +7,14 @@ export interface IPost extends Document {
     description: string;
     isDelete: boolean;
     likes?: Array<{
-        userId: string;
+        UserId: string;
         createdAt: Date;
     }>;
     comments?: Array<{
-        userId: string;
+        _id?: mongoose.Types.ObjectId;
+        UserId: string;
         content: string;
-        created_at: Date;
+        createdAt: Date;
     }>;
     created_at: Date;
 }

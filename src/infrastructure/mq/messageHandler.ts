@@ -70,6 +70,22 @@ export default class MessageHandler {
                     
                 case 'unlike-post':
                     response = await postController.unlikePost(data);
+                    break; 
+                    
+                case 'add-comments':
+                    response = await postController.addComments(data);
+                    break;
+
+                case 'fetch-comment':
+                    response = await postController.fetchedComments(data);
+                    break; 
+                    
+                case 'delete-comment':
+                    response = await postController.deleteComment(data);
+                    break;   
+                    
+                case 'delete-post':
+                    response = await postController.deletePost(data);
                     break;    
 
             default:
