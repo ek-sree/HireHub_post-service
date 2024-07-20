@@ -16,6 +16,10 @@ export interface IPost extends Document {
         content: string;
         createdAt: Date;
     }>;
+    reportPost?: Array<{
+        UserId: string;
+        reason: string;
+    }>
     created_at: Date;
 }
 

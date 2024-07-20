@@ -119,6 +119,19 @@ class PostController {
             throw error;
         }
     }
+
+    async postReport(data:{postId:string, UserId:string, reason:string}){
+        try {
+            const postId = data.postId;
+            const UserId = data.UserId;
+            const reason = data.reason;
+            const result = await this.postService.reportPost(postId,UserId, reason);
+            return result;
+        } catch (error) {
+            console.error("Error report posts :", error);
+            throw error;
+        }
+    }
 }
 
 export const postController = new PostController();

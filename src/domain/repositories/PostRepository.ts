@@ -164,5 +164,21 @@ export class PostRepository implements IPostRepository {
             throw new Error(`Error deleting posts: ${err.message}`);
         }
     }
+
+    async reportPost(postId:string, UserId:string, reason:string): Promise<{success:boolean, message:string}>{
+        try {
+            const post = await Post.findOne({_id: new mongoose.Types.ObjectId(postId)});
+            if(!post){
+                return {success:false, message:"No post found"}
+            }
+            post.reportPost?.push({UserId, reason})
+            await post.save();
+            return {success:true, message:"Reported successfully"}
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error reporting posts", err);
+            throw new Error(`Error reporting posts: ${err.message}`);
+        }
+    }
     
 }

@@ -46,6 +46,18 @@ const postSchema: Schema = new Schema({
             },
         },
     ],
+    reportPost:[
+        {
+            UserId: {
+                type:String,
+                required: true
+            },
+            reason:{
+                type:String,
+                required:true,
+            }
+        }
+    ],
     isDelete: {
         type: Boolean,
         default: false,

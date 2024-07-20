@@ -188,6 +188,18 @@ class PostService {
         }
     }
     
+    async reportPost(postId:string, UserId:string, reason:string):Promise<{success:boolean, message:string}>{
+        try {
+            const result = await this.postRepo.reportPost(postId, UserId, reason);
+            if(!result || !result.success){
+                return {success:result.success, message:result.message}
+            }
+            return {success:result.success, message:result.message}
+        } catch (error) {
+            console.error("Error reporting posts:", error);
+            throw new Error(`Error reporting posts: ${error instanceof Error ? error.message : "Unknown error"}`);
+        }
+    }
     
 }
 

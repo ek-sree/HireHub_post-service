@@ -1,3 +1,4 @@
+import { adminController } from '../../interfaces/controller/adminController';
 import { jobpostController } from '../../interfaces/controller/jobpostController';
 import { postController } from '../../interfaces/controller/postController';
 import RabbitMQClient from './client';
@@ -86,6 +87,14 @@ export default class MessageHandler {
                     
                 case 'delete-post':
                     response = await postController.deletePost(data);
+                    break;  
+                    
+                case 'report-post':
+                    response = await postController.postReport(data);
+                    break;    
+
+                case 'get-reported-post':
+                    response = await adminController.getReportedPosts(data);
                     break;    
 
             default:
