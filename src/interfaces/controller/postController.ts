@@ -132,6 +132,18 @@ class PostController {
             throw error;
         }
     }
+
+    async updatePost(data:{postId:string, description:string}){
+        try {
+            const postId = data.postId;
+            const description = data.description;
+            const result = await this.postService.editPost(postId,description)
+            return result;
+        } catch (error) {
+            console.error("Error updating posts :", error);
+            throw error;
+        }
+    }
 }
 
 export const postController = new PostController();

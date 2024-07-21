@@ -95,7 +95,11 @@ export default class MessageHandler {
 
                 case 'get-reported-post':
                     response = await adminController.getReportedPosts(data);
-                    break;    
+                    break;  
+                    
+                case 'update-post':
+                    response = await postController.updatePost(data);
+                    break;
 
             default:
                 response = { error: "Operation not supported" };

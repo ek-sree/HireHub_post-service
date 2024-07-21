@@ -180,5 +180,21 @@ export class PostRepository implements IPostRepository {
             throw new Error(`Error reporting posts: ${err.message}`);
         }
     }
+
+    async updatePost(postId:string, description:string):Promise<{success:boolean, message:string, data?:IPost[]}>{
+        try {
+            const post = await Post.findOne({_id: new mongoose.Types.ObjectId(postId)});
+            if(!post){
+                return {success:false, message:"No post found"}
+            }
+            post.description = description;
+            await post.save();
+            return {success:true, message:"Description updated succesfully", data:[post]}
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error updating user posts", err);
+            throw new Error(`Error updating user posts: ${err.message}`);
+        }
+    }
     
 }

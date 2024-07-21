@@ -200,6 +200,19 @@ class PostService {
             throw new Error(`Error reporting posts: ${error instanceof Error ? error.message : "Unknown error"}`);
         }
     }
+
+    async editPost(postId:string, description:string):Promise<{success:boolean, message:string, data?:IPost[]}>{
+        try {
+            const result = await this.postRepo.updatePost(postId,description);
+            if(!result || !result.success){
+                return {success:result.success, message:result.message}
+            }
+            return {success:result.success, message:result.message, data:result.data}
+        } catch (error) {
+            console.error("Error editing user posts:", error);
+            throw new Error(`Error editing user posts: ${error instanceof Error ? error.message : "Unknown error"}`);
+        }
+    }
     
 }
 
