@@ -89,7 +89,7 @@ export class JobpostRepository implements IJobpostRepository {
         }
     }
 
-    async createApplyJob({ jobId, name, email, phone, resume }: { jobId: string, name: string, email: string, phone: string, resume: string }): Promise<{ success: boolean, message: string }> {
+    async createApplyJob({userId, jobId, name, email, phone, resume }: {userId:string, jobId: string, name: string, email: string, phone: string, resume: string }): Promise<{ success: boolean, message: string }> {
         try {
             console.log("job Id", jobId);
             
@@ -100,6 +100,7 @@ export class JobpostRepository implements IJobpostRepository {
             
             job.applications = job.applications || [];
             job.applications.push({
+                userId:userId,
                 name: name,
                 email: email,
                 phone: phone,

@@ -83,9 +83,9 @@ class JobPostService {
         }
     }
 
-    async applyJob(jobId:string, name:string, email:string, phone:string, resume:string): Promise<{success:boolean, message:string}>{
+    async applyJob(userId:string, jobId:string, name:string, email:string, phone:string, resume:string): Promise<{success:boolean, message:string}>{
         try {
-            const result = await this.jobpostRepo.createApplyJob({jobId,name, email,phone, resume});
+            const result = await this.jobpostRepo.createApplyJob({userId, jobId,name, email,phone, resume});
             if(!result){
                 return {success:false, message:"Cant apply right now"}
             }

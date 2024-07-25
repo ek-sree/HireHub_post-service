@@ -38,6 +38,10 @@ const jobpostSchema: Schema = new Schema({
     },
     applications: {
         type: [{
+          userId:{
+            type:String,
+            required: true
+          },
           name: {
             type: String,
             required: true

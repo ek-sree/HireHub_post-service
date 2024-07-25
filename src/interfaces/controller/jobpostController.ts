@@ -50,11 +50,11 @@ class JobpostController {
         }
     }
 
-    async applyToJob(data:{jobId:string, name:string, email:string, phone: string, resumes:string}){
+    async applyToJob(data:{userId:string, jobId:string, name:string, email:string, phone: string, resumes:string}){
         try {
-            const { jobId, name, email, phone, resumes } = data; 
+            const {userId, jobId, name, email, phone, resumes } = data; 
             
-            const result = await jobpostService.applyJob(jobId,name,email,phone,resumes);
+            const result = await jobpostService.applyJob(userId,jobId,name,email,phone,resumes);
             return result;
         } catch (error) {
             console.error("Error applying job:", error);
