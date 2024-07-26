@@ -144,6 +144,19 @@ class PostController {
             throw error;
         }
     }
+
+    async editComment(data:{id:string, postId:string, content:string}){
+        try {
+            const id = data.id;
+            const postId = data.postId;
+            const content = data.content;
+            const result = await this.postService.editComment(id,postId,content);
+            return result;
+        } catch (error) {
+            console.error("Error updating comment :", error);
+            throw error;
+        }
+    }
 }
 
 export const postController = new PostController();

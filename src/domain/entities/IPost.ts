@@ -14,6 +14,7 @@ export interface IPost extends Document {
         _id?: mongoose.Types.ObjectId;
         UserId: string;
         content: string;
+        isEdited:boolean;
         createdAt: Date;
     }>;
     reportPost?: Array<{

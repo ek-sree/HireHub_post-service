@@ -101,6 +101,10 @@ export default class MessageHandler {
                     response = await postController.updatePost(data);
                     break;
 
+                case 'edit-comment':
+                    response = await postController.editComment(data);
+                    break;    
+
             default:
                 response = { error: "Operation not supported" };
                 break;

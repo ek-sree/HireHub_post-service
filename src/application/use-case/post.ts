@@ -128,7 +128,7 @@ class PostService {
         }
     }
 
-    async addComment(postId:string,UserId:string, comments:string):Promise<{success:boolean, message:string, data?:{UserId:string, content:string,createdAt:Date}[]}>{
+    async addComment(postId:string,UserId:string, comments:string):Promise<{success:boolean, message:string, data?:{UserId:string, content:string,isEdited:boolean,createdAt:Date}[]}>{
         try {
             const result = await this.postRepo.createComment(postId, UserId, comments);
             if(!result || !result.success){
@@ -141,7 +141,7 @@ class PostService {
         }
     }
 
-    async fetchComments(postId:string):Promise<{success:boolean, message:string, data?:{UserId:string, content:string,createdAt:Date}[]}>{
+    async fetchComments(postId:string):Promise<{success:boolean, message:string, data?:{UserId:string, content:string,isEdited:boolean,createdAt:Date}[]}>{
         try {
             const result = await this.postRepo.findComments(postId);
             if(!result || !result.success){
@@ -211,6 +211,19 @@ class PostService {
         } catch (error) {
             console.error("Error editing user posts:", error);
             throw new Error(`Error editing user posts: ${error instanceof Error ? error.message : "Unknown error"}`);
+        }
+    }
+
+    async editComment(id: string, postId: string, content: string): Promise<{ success: boolean, message: string, data?: { UserId: string, content: string,isEdited:boolean, createdAt: Date }[] }>{
+        try {
+            const result = await this.postRepo.updateComment(id,postId, content);
+            if(!result || !result.success){
+                return {success:result.success, message:result.message}
+            }
+            return {success:result.success, message:result.message, data:result.data}
+        } catch (error) {
+            console.error("Error editing user comments:", error);
+            throw new Error(`Error editing user comments: ${error instanceof Error ? error.message : "Unknown error"}`);
         }
     }
     

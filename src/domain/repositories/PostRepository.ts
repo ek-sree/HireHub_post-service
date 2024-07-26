@@ -97,14 +97,14 @@ export class PostRepository implements IPostRepository {
         }
       }
 
-    async createComment(postId:string,UserId:string, comments:string):Promise<{success:boolean, message:string, data?:{UserId:string, content:string,createdAt:Date}[]}>{
+    async createComment(postId:string,UserId:string, comments:string):Promise<{success:boolean, message:string, data?:{UserId:string, content:string,isEdited:boolean,createdAt:Date}[]}>{
         try {
             
             const post = await Post.findOne({_id: new mongoose.Types.ObjectId(postId)});
             if(!post){
                 return {success:false, message:"No post found"}
             }
-            post.comments?.push({UserId, content:comments, createdAt: new Date()});
+            post.comments?.push({UserId, content:comments, isEdited:false, createdAt: new Date()});
             await post.save();
             return {success:true, message:"Commented successfully", data:post.comments}
         } catch (error) {
@@ -114,7 +114,7 @@ export class PostRepository implements IPostRepository {
         }
     }
 
-    async findComments(postId: string): Promise<{ success: boolean, message: string, data?: { UserId: string, content: string, createdAt: Date }[] }> {
+    async findComments(postId: string): Promise<{ success: boolean, message: string, data?: { UserId: string, content: string,isEdited:boolean, createdAt: Date }[] }> {
         try {
             console.log("postId comment fetch",postId);
             
@@ -194,6 +194,34 @@ export class PostRepository implements IPostRepository {
             const err = error as Error;
             console.log("Error updating user posts", err);
             throw new Error(`Error updating user posts: ${err.message}`);
+        }
+    }
+
+    async updateComment(id: string, postId: string, content: string): Promise<{ success: boolean, message: string, data?: { UserId: string, content: string,isEdited:boolean, createdAt: Date }[] }> {
+        try {
+            const post = await Post.findOne({ _id: new mongoose.Types.ObjectId(postId) });
+            if (!post) {
+                return { success: false, message: "No post found" };
+            }
+    
+            if (!post.comments) {
+                return { success: false, message: "No comments found on this post" };
+            }
+    
+            const commentIndex = post.comments.findIndex(comment => comment._id?.toString() === id);
+            if (commentIndex === -1) {
+                return { success: false, message: "No comment found" };
+            }
+    
+            post.comments[commentIndex].content = content;
+            post.comments[commentIndex].isEdited = true;
+            await post.save();
+    
+            return { success: true, message: "Comment updated successfully", data: post.comments };
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error updating user comment", err);
+            throw new Error(`Error updating user comment: ${err.message}`);
         }
     }
     
