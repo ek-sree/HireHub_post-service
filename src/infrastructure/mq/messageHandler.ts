@@ -1,5 +1,6 @@
 import { adminController } from '../../interfaces/controller/adminController';
 import { jobpostController } from '../../interfaces/controller/jobpostController';
+import { notificationController } from '../../interfaces/controller/notificationController';
 import { postController } from '../../interfaces/controller/postController';
 import RabbitMQClient from './client';
 
@@ -103,7 +104,23 @@ export default class MessageHandler {
 
                 case 'edit-comment':
                     response = await postController.editComment(data);
-                    break;    
+                    break;   
+                    
+                case 'post-for-reports':
+                    response = await adminController.getPostsReposts();
+                    break;  
+                    
+                case 'jobpost-for-reports':
+                    response = await adminController.getJobReports();
+                    break; 
+                    
+                case 'clear-reports':
+                    response = await adminController.clearPostReports(data);
+                    break;   
+                    
+                case 'like-notification':
+                    response = await  notificationController.addNotification(data);
+                    break; 
 
             default:
                 response = { error: "Operation not supported" };

@@ -1,5 +1,8 @@
+import mongoose from "mongoose";
+import { Jobpost } from "../../model/Jobpost";
 import { Post } from "../../model/Post";
 import { IAdmin } from "../entities/IAdmin";
+import { IPost } from "../entities/IPost";
 import { IAdminRepository } from "./IAdminRepository";
 
 export class AdminRepository implements IAdminRepository {
@@ -57,6 +60,44 @@ export class AdminRepository implements IAdminRepository {
                 success: false,
                 message: `Error retrieving reported posts: ${err.message}`
             };
+        }
+    }
+
+    async findPostsForReports(): Promise<{success: boolean, message:string, totalPosts:number}>{
+        try {
+            const totalPosts = await Post.countDocuments();
+            return{success:true, message:"Post count found",totalPosts}
+        } catch (error) {
+            const err = error as Error;
+            console.error("Error retrieving  posts", err);
+            throw new Error(`Error fetching posts ${err}`);
+        }
+    }
+
+    async findJobPostForReports():Promise<{success:boolean, message:string, totalJobPost:number}>{
+        try {
+            const totalJobPost = await Jobpost.countDocuments();
+            return{success:true, message:"Job post found", totalJobPost}
+        } catch (error) {
+            const err = error as Error;
+            console.error("Error retrieving  job posts", err);
+            throw new Error(`Error fetching job posts ${err}`);
+        }
+    }
+
+    async updateReportPost(postId:string):Promise<{success:boolean, message:string, data?:IPost[]}>{
+        try {
+            const post = await Post.findOne({_id: new mongoose.Types.ObjectId(postId)});
+            if(!post){
+                return {success:false, message:"No posts found"}
+            }
+            post.reportPost = [];
+            await post.save();
+            return {success:true, message:"Cleared reports", data:[post]}
+        } catch (error) {
+            const err = error as Error;
+            console.error("Error clearing reported post", err);
+            throw new Error(`Error clearing reported post ${err}`);
         }
     }
 }

@@ -1,4 +1,5 @@
 import { IAdmin } from "../../domain/entities/IAdmin";
+import { IPost } from "../../domain/entities/IPost";
 import { AdminRepository } from "../../domain/repositories/AdminRepository";
 import { fetchFileFromS3 } from "../../infrastructure/s3/s3Actions";
 
@@ -29,6 +30,39 @@ class AdminService {
         } catch (error) {
             console.error("Error in fetching reported posts:", error);
             throw new Error(`Error getting reported posts: ${error instanceof Error ? error.message : "Unknown error"}`);
+        }
+    }
+
+    async fetchPostForReport():Promise<{success: boolean, message:string, data?:number}>{
+        try {
+            const result = await this.adminRepo.findPostsForReports()
+            return{success:result.success, message:result.message, data:result.totalPosts}
+        } catch (error) {
+            console.error("Error in fetching  posts:", error);
+            throw new Error(`Error getting  posts: ${error instanceof Error ? error.message : "Unknown error"}`);
+        }
+    }
+
+    async fetchJobPostForReport():Promise<{success:boolean, message:string, data?:number}>{
+        try {
+            const result = await this.adminRepo.findJobPostForReports();
+            return {success:result.success , message:result.message, data:result.totalJobPost}
+        } catch (error) {
+            console.error("Error in fetching  job posts:", error);
+            throw new Error(`Error getting  job posts: ${error instanceof Error ? error.message : "Unknown error"}`);
+        }
+    }
+
+    async clearedReposts(postId:string):Promise<{success:boolean, message:string, data?:IPost[]}>{
+        try {
+            const result = await this.adminRepo.updateReportPost(postId);
+            if(!result || !result.success){
+                return {success:result.success, message:result.message}
+            }
+            return {success:result.success, message:result.message, data:result.data}
+        } catch (error) {
+            console.error("Error in clearing reports in posts  :", error);
+            throw new Error(`Error getting reports posts: ${error instanceof Error ? error.message : "Unknown error"}`);
         }
     }
 }

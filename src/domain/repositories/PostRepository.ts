@@ -224,5 +224,36 @@ export class PostRepository implements IPostRepository {
             throw new Error(`Error updating user comment: ${err.message}`);
         }
     }
+
+    async postNotification(postId:string):Promise<{success:boolean, message:string, data?:string}>{
+        try {
+            const post = await Post.findOne({_id: new mongoose.Types.ObjectId(postId)});
+            if(!post){
+                return {success:false, message:"No post found"}
+            }
+            const imageUrl = post.imageUrl[0];
+            return {success:true, message:"Got imageUrl", data:imageUrl}
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error getting post url", err);
+            throw new Error(`Error getting post url: ${err.message}`);
+        }
+    }
+
+    async postNotifications(postIds: string[]): Promise<{ success: boolean, message: string, data?: string[] }> {
+        try {
+            const posts = await Post.find({ _id: { $in: postIds.map(id => new mongoose.Types.ObjectId(id)) } });
+            if (!posts || posts.length === 0) {
+                return { success: false, message: "No posts found" };
+            }
+            const imageUrls = posts.map(post => post.imageUrl).flat();
+            return { success: true, message: "Got imageUrls", data: imageUrls };
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error fetching notifications", err);
+            throw new Error(`Error fetching notifications: ${err.message}`);
+        }
+    }
+    
     
 }

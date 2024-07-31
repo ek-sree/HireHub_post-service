@@ -19,6 +19,37 @@ class AdminController {
             throw error;
         }
     }
+
+    async getPostsReposts(){
+        try {
+            const result = await this.adminService.fetchPostForReport();
+            return result;
+        } catch (error) {
+            console.error("Error geting  posts:", error);
+            throw error;
+        }
+    }
+
+    async getJobReports(){
+        try {
+            const result = await this.adminService.fetchJobPostForReport();
+            return result;
+        } catch (error) {
+            console.error("Error geting  job posts:", error);
+            throw error;
+        }
+    }
+
+    async clearPostReports(data:{postId:string}){
+        try {
+            const postId = data.postId;
+            const result = await this.adminService.clearedReposts(postId);
+            return result;
+        } catch (error) {
+            console.error("Error clearing reported posts:", error);
+            throw error;
+        }
+    }
 }
 
 export const adminController = new AdminController();
