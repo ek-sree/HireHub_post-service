@@ -122,6 +122,10 @@ export default class MessageHandler {
                     response = await  notificationController.addNotification(data);
                     break; 
 
+                case 'fetch-notifications':
+                    response = await notificationController.getNotification(data);
+                    break;    
+
             default:
                 response = { error: "Operation not supported" };
                 break;

@@ -17,6 +17,17 @@ class NotificationController {
             throw error;
         }
     }
+
+    async getNotification(data:{userId:string}){
+        try {
+            const userId = data.userId;
+            const result = await this.notificationService.fetchNotification(userId);
+            return result;
+        } catch (error) {
+            console.error("Error fetching notification:", error);
+            throw error;
+        }
+    }
 }
 
 export const notificationController = new NotificationController();

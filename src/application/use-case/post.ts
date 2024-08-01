@@ -102,9 +102,9 @@ class PostService {
         }
     }
 
-    async likePost(postId:string, UserId:string):Promise<{success:boolean, message:string,data?:{UserId:string, createdAt:Date}[]}>{
+    async likePost(postId:string, UserId:string,postUser:string):Promise<{success:boolean, message:string,data?:{UserId:string, createdAt:Date}[]}>{
         try {
-            const result = await this.postRepo.updateLikePost(postId,UserId);
+            const result = await this.postRepo.updateLikePost(postId,UserId,postUser);
             if(!result.success || !result.data){
                 return {success:result.success, message:result.message}
             }

@@ -6,7 +6,6 @@ import { IPostRepository } from "./IPostRepository";
 export class PostRepository implements IPostRepository {
     async save(post: ISavePostData): Promise<{ success: boolean; message: string; data?: IPost }> {
         try {
-            console.log("Data to be saved:", post);
 
             const newPost = new Post({
                 UserId: post.userId,
@@ -47,6 +46,7 @@ export class PostRepository implements IPostRepository {
     async findUserPosts(userId: string): Promise<{ success: boolean, message: string, data?: IPost[] }> {
         try {
             const userIdStr = String(userId);
+    console.log("user iddddddd what jereeee=-=-=-=",userIdStr);
     
             const posts = await Post.find({ UserId: userIdStr }).sort({ created_at: -1 });
             if (!posts || posts.length === 0) {
@@ -60,11 +60,11 @@ export class PostRepository implements IPostRepository {
         }
     }
 
-    async updateLikePost(postId: string, UserId: string) {
+    async updateLikePost(postId: string, UserId: string, postUser:string) {
         try {
           const post = await Post.findOneAndUpdate(
             { _id: postId },
-            { $addToSet: { likes: { UserId, createdAt: new Date() } } },
+            { $addToSet: { likes: { UserId,postUser, createdAt: new Date() } } },
             { new: true }
           );
       

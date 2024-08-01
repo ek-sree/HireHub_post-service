@@ -8,6 +8,7 @@ export interface IPost extends Document {
     isDelete: boolean;
     likes?: Array<{
         UserId: string;
+        postUser:string;
         createdAt: Date;
     }>;
     comments?: Array<{

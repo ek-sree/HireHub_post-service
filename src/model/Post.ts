@@ -23,6 +23,11 @@ const postSchema: Schema = new Schema({
                 type: String,
                 required: true,
             },
+            postUser:{
+                type:String,
+                required:true,
+                default:''
+            },
             createdAt: {
                 type: Date,
                 default: Date.now,

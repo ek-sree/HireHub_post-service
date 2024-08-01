@@ -43,13 +43,13 @@ class PostController {
         }
     }
 
-    async likePost(data:{postId:string, UserId:string}){
+    async likePost(data:{postId:string, UserId:string, postUser:string}){
         try {
             const postId = data.postId;
             const UserId = data.UserId;
-            console.log("userID like",UserId);
+            const postUser = data.postUser
             
-            const result = await this.postService.likePost(postId,UserId);
+            const result = await this.postService.likePost(postId,UserId, postUser);
             return result;
         } catch (error) {
             console.error("Error liking user posts:", error);
