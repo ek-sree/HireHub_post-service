@@ -46,7 +46,6 @@ export class PostRepository implements IPostRepository {
     async findUserPosts(userId: string): Promise<{ success: boolean, message: string, data?: IPost[] }> {
         try {
             const userIdStr = String(userId);
-    console.log("user iddddddd what jereeee=-=-=-=",userIdStr);
     
             const posts = await Post.find({ UserId: userIdStr }).sort({ created_at: -1 });
             if (!posts || posts.length === 0) {
@@ -115,9 +114,7 @@ export class PostRepository implements IPostRepository {
     }
 
     async findComments(postId: string): Promise<{ success: boolean, message: string, data?: { UserId: string, content: string,isEdited:boolean, createdAt: Date }[] }> {
-        try {
-            console.log("postId comment fetch",postId);
-            
+        try {            
             const post = await Post.findById(new mongoose.Types.ObjectId(postId));
             
             if (!post) {
@@ -132,9 +129,7 @@ export class PostRepository implements IPostRepository {
     }
 
     async deleteComment(id: string, postId: string): Promise<{ success: boolean, message: string, data?: { UserId: string, content: string, createdAt: Date }[] }> {
-        try {
-            console.log("delete idsssssss",id,postId);
-            
+        try {            
             const post = await Post.findOne({ _id: new mongoose.Types.ObjectId(postId) });
             if (!post) {
                 return { success: true, message: "Couldn't find posts" };

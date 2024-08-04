@@ -10,8 +10,6 @@ class PostController {
 
     async addPost(data: IAddPostData) {
         try {
-            console.log("Data reached here:", data);
-            console.log("images",data.images);
             
             const result = await this.postService.addPost(data);
             return result;
@@ -85,7 +83,6 @@ class PostController {
     async fetchedComments(data:{postId:string}){
         try {
             const postId = data.postId;
-            console.log("postId comment fetch",postId);
             const result = await this.postService.fetchComments(postId);
             return result;
         } catch (error) {
@@ -95,9 +92,7 @@ class PostController {
     }
 
     async deleteComment(data:{id:string, postId:string}){
-        try {
-            console.log("delete datass",data);
-            
+        try {            
             const id = data.id;
             const postId = data.postId;
             const result = await this.postService.removeComment(id,postId);

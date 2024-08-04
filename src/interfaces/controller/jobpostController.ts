@@ -6,7 +6,6 @@ class JobpostController {
 
     async addNewJob(data: { jobData: IJobpost }) {
         try {
-            console.log("Received data in addNewJob:", data);
             const result = await this.jobpostServiceInstance.addJob(data);
             return result;
         } catch (error) {
@@ -67,9 +66,7 @@ class JobpostController {
             const jobId = data.jobId;
             const page = data.page;
             const limit = data.limit;
-            const result = await jobpostService.fetchApplication(jobId, page, limit);
-            console.log("333333",result);
-            
+            const result = await jobpostService.fetchApplication(jobId, page, limit);            
             return result;
         } catch (error) {
             console.error("Error fetching applications:", error);
@@ -103,7 +100,6 @@ class JobpostController {
         try {
             
             const recruiterId = data.recruiterId;
-            console.log("data controlllllerrt",recruiterId);
             const result = await jobpostService.selectApplication(recruiterId);
             return result;
         } catch (error) {
@@ -124,7 +120,6 @@ class JobpostController {
     }
 
     async updateJobStatus(data:{jobId: string}){
-        console.log("data soft delete", data);
         try {
             const jobId = data.jobId;
             const result = await jobpostService.blockUnblockJob(jobId);

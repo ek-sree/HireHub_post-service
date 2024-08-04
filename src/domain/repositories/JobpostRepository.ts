@@ -6,13 +6,9 @@ import mongoose from "mongoose";
 
 export class JobpostRepository implements IJobpostRepository {
     async save(jobpost: IJobpost): Promise<IJobpost> {
-        try {
-            console.log("repository", jobpost);
-            
+        try {            
             const newJobpost = new Jobpost(jobpost);
-            const savedJobpost = await newJobpost.save();
-            console.log("saved add new job", savedJobpost);
-            
+            const savedJobpost = await newJobpost.save();            
             return savedJobpost;
         } catch (error) {
             const err = error as Error;
@@ -74,7 +70,6 @@ export class JobpostRepository implements IJobpostRepository {
     async editJob(jobData: IJobpost): Promise<IJobpost | null> {
         try {
             const { jobId } = jobData;
-            console.log("id job", jobId);
             if(!jobId) {
                 throw new Error("Hob id is not found");
             }
@@ -90,9 +85,7 @@ export class JobpostRepository implements IJobpostRepository {
     }
 
     async createApplyJob({userId, jobId, name, email, phone, resume }: {userId:string, jobId: string, name: string, email: string, phone: string, resume: string }): Promise<{ success: boolean, message: string }> {
-        try {
-            console.log("job Id", jobId);
-            
+        try {            
             const job = await Jobpost.findById(jobId);
             if (!job) {
                 return { success: false, message: "Can't find job" };

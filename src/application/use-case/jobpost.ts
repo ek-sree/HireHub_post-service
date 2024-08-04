@@ -14,11 +14,7 @@ class JobPostService {
     async addJob(data: { jobData: IJobpost }): Promise<{ success: boolean, message: string, job?: IJobpost }> {
         try {
             const { jobData } = data;
-            console.log("Received jobData in addJob:", jobData);
-
             const result = await this.jobpostRepo.save(jobData);
-            console.log("Result saving new job post data", result);
-
             if (!result) {
                 return { success: false, message: "Can't save data" };
             }

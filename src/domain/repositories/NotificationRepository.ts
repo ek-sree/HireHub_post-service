@@ -4,9 +4,7 @@ import { INotificationRepository } from "./INotificationRepository";
 
 export class NotificationRepository implements INotificationRepository{
     async save(notification: { userId: string; postId: string;likedBy:string, notification?: string; }): Promise<{ success: boolean; message: string; data?: INotification; }> {
-        try {
-            console.log("saving notification",notification.userId, notification.likedBy);
-            
+        try {            
             const newNotification = new Notification({
                 userId: notification.userId,
                 postId: notification.postId,
@@ -28,9 +26,7 @@ export class NotificationRepository implements INotificationRepository{
 
     async findNotifications(userId:string):Promise<{success:boolean, message:string, data?:INotification[]}>{
         try {
-            const notifications = await Notification.find({userId})
-            console.log("notificationssssss fetch",notifications);
-            
+            const notifications = await Notification.find({userId})            
             if (!notifications || notifications.length === 0) {
                 return { success: false, message: "No notifications found" };
             }
