@@ -113,10 +113,6 @@ export class JobpostRepository implements IJobpostRepository {
 
     async findApplication(jobId: string, page: number, limit: number): Promise<{ success: boolean, message: string, data?: IApplication[], totalUsers?: number }> {
         try {
-            if (!mongoose.Types.ObjectId.isValid(jobId)) {
-                console.log(`Invalid jobId format: ${jobId}`);
-                return { success: false, message: "Invalid jobId format" };
-            }
     
             const skip = (page - 1) * limit;
             const job = await Jobpost.findOne({ _id: new mongoose.Types.ObjectId(jobId) });
@@ -137,14 +133,51 @@ export class JobpostRepository implements IJobpostRepository {
             throw new Error(`Error viewing applications: ${err.message}`);
         }
     }
+
+    async findAwaitApplication(jobId:string, page:number, limit:number):Promise<{success:boolean, message:string, data?: IApplication[], totalUsers?:number}>{
+        try {
+            const skip = (page - 1) * limit;
+            const job = await Jobpost.findOne({_id: new mongoose.Types.ObjectId(jobId)});
+            if(!job){
+                return { success: false, message: "No job found" };
+            }
     
+            const awaitApplications = job.applications?.filter(app => app.status === 'await') || [];
+            const totalUsers = awaitApplications.length;
+            const paginatedApplications = awaitApplications.slice(skip, skip + limit);
+
+            return {success:true, message:"Found awaited applications", data:paginatedApplications, totalUsers}
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error showing awaited application", err);
+            throw new Error(`Error viewing awaited applications: ${err.message}`);
+        }
+    }
+    
+
+    async awaitApplication(jobId:string, applicationId:string): Promise<{success:boolean, message:string}>{
+        try {
+            const job = await Jobpost.findOne({_id: new mongoose.Types.ObjectId(jobId)});
+            if(!job){
+                return {success:false, message:"cant find the job"}
+            }
+            const application = job.applications?.find(app=>app._id.toString()=== applicationId)
+            if(!application){
+                return {success: false, message:"Cant find the job"}
+            }
+            application.status = 'await';
+            await job.save();
+            return {success:true, message:"status changed to await"}
+        } catch (error) {
+            const err = error as Error;
+            console.log("Error awaiting application", err);
+            throw new Error(`Error awaiting applications: ${err.message}`);
+        }
+    }
 
     async acceptApplication(jobId:string, applicationId:string): Promise<{success:boolean, message:string, data?:IJobpost, email?:string}>{
         try {
-            if (!mongoose.Types.ObjectId.isValid(jobId)) {
-                console.log(`Invalid jobId format: ${jobId}`);
-                return { success: false, message: "Invalid jobId format" };
-            }
+            
             const job = await Jobpost.findOne({_id: new mongoose.Types.ObjectId(jobId)});
             if(!job){
                 return {success: false, message:"cant find the job"}
@@ -213,9 +246,7 @@ export class JobpostRepository implements IJobpostRepository {
                     });
                 }
             });
-    
-            console.log("applica", acceptedApplications);
-    
+        
             return { success: true, message: "found applications", datas: acceptedApplications };
         } catch (error) {
             const err = error as Error;
@@ -235,7 +266,6 @@ export class JobpostRepository implements IJobpostRepository {
                 return { success: false, message: "No job found" };
             }
             const cadidates = job?.applications?.filter((app:IApplication)=>app.status === "accepted")
-            console.log("cadidates",cadidates);
             return {success:true, message:"Cadidates fetched",data:cadidates}
         } catch (error) {
             const err = error as Error;

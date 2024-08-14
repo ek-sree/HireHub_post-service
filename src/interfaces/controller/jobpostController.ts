@@ -74,6 +74,30 @@ class JobpostController {
         }
     }
 
+    async fetchedAwaitedApplication(data:{jobId:string, page:number, limit:number}){
+        try {
+            const jobId = data.jobId;
+            const page = data.page;
+            const limit = data.limit;
+            const result = await jobpostService.fetchAwaitedApplication(jobId, page, limit);            
+            return result;
+        } catch (error) {
+            console.error("Error fetching applications:", error);
+            throw error;
+        }
+    }
+
+    async awaitApplication(data:{jobId: string,  applicationId:string}){
+        try {
+            const {jobId, applicationId} = data;
+            const result = await jobpostService.awaitApplication(jobId, applicationId);
+            return result;
+        } catch (error) {
+            console.error("Error awaiting applications:", error);
+            throw error;
+        }
+    }
+
     async acceptApplication(data:{jobId:string, applicationId:string}){
         try {
             const {jobId, applicationId} = data

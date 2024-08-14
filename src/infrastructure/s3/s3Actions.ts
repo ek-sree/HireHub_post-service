@@ -26,6 +26,7 @@ export async function uploadFileToS3(fileBuffer: Buffer, originalname: string): 
             Key: imageName,
             Body: fileBuffer,
             ContentType: contentType,
+            ACL: 'public-read',
         }
     });
 

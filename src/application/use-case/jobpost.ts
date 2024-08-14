@@ -105,7 +105,32 @@ class JobPostService {
             throw error;
         }
     }
+
+    async fetchAwaitedApplication(jobId:string, page:number, limit:number): Promise<{success:boolean, message:string, applications?:IApplication[], totalUsers?:number}>{
+        try {
+            const result = await this.jobpostRepo.findAwaitApplication(jobId, page, limit);
+            if(!result || !result.success){
+                return {success:result.success, message:result.message}
+            }
+            return {success:true, message:result.message, applications:result.data, totalUsers:result.totalUsers}
+        } catch (error) {
+            console.error("Error in fetching awated applications:", error);
+            throw error;
+        }
+    }
     
+    async awaitApplication(jobId:string, applicationId:string):Promise<{success:boolean, message:string}>{
+        try {
+            const result = await this.jobpostRepo.awaitApplication(jobId, applicationId);
+            if(!result || !result.success){
+                return {success:result.success, message:result.message}
+            }
+            return {success:true, message:result.message}
+        } catch (error) {
+            console.error("Error in awaiting application:", error);
+            throw error;
+        } 
+    }
 
     async acceptApplication(jobId:string, applicationId:string):Promise<{success:boolean, message:string}>{
         try {
@@ -161,6 +186,7 @@ class JobPostService {
     async shorlistedApplication(jobId:string):Promise<{success:boolean, message:string, Candidates?:IApplication[]}>{
         try {
             const result = await this.jobpostRepo.findShortListedCadidates(jobId);
+            
             if(!result){
                 return {success:false, message:"coundt found any data"}
             }

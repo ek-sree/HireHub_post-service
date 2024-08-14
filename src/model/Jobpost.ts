@@ -61,7 +61,7 @@ const jobpostSchema: Schema = new Schema({
           status: {
             type: String,
             default: "pending",
-            enum: ["pending", "accepted", "rejected"]
+            enum: ["pending", "accepted","await", "rejected"]
           },
           created_at: {
             type:Date, 
